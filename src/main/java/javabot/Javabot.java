@@ -62,7 +62,7 @@ public class Javabot extends PircBot implements ApplicationContextAware {
     private KarmaDao karmaDao;
     @Autowired
     private ConfigDao configDao;
-    @SpringBean
+    @Autowired
     private ShunDao shunDao;
     private boolean disconnecting = false;
     private ApplicationContext context;
