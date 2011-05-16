@@ -11,6 +11,7 @@
     <name>javabot</name>
 
     <modules>
+        <module>milo</module>
         <module>spi-apt</module>
         <module>apt-tools</module>
         <module>core</module>
@@ -18,7 +19,7 @@
         <module>camel-core</module>
         <module>web</module>
         <module>web-grails</module>
-        <!--<module>scalacore</module>-->
+        <module>scalacore</module>
     </modules>
 
     <build>
@@ -274,7 +275,7 @@
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>5.14.2</version>
+                <version>6.0</version>
             </dependency>
 
             <dependency>
