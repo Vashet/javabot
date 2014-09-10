@@ -14,7 +14,7 @@ import javabot.Message;
 @SPI(BotOperation.class)
 public class DaysToChristmasOperation extends BotOperation {
   @Override
-  public List<Message> handleMessage(final IrcEvent event) {
+  public final boolean handleMessage(final MessageEvent event) {
     final List<Message> responses = new ArrayList<Message>();
     if ("countdown to christmas".equals(event.getMessage().toLowerCase())) {
       LocalDateTime christmas = LocalDateTime.of(now().getYear(), Month.DECEMBER, 25, 0, 0, 0);

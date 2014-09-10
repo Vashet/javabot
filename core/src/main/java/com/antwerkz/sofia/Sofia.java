@@ -59,6 +59,22 @@ public class Sofia {
         return getMessageValue("account.too.new", locale);
     }
 
+    public static String adminAdded(Object arg0, Locale... locale) {
+        return MessageFormat.format(getMessageValue("admin.added", locale), arg0);
+    }
+
+    public static String adminAlready(Object arg0, Locale... locale) {
+        return MessageFormat.format(getMessageValue("admin.already", locale), arg0);
+    }
+
+    public static String adminParseFailure(Object arg0, Locale... locale) {
+        return MessageFormat.format(getMessageValue("admin.parseFailure", locale), arg0);
+    }
+
+    public static String botSelfTalk(Locale... locale) {
+        return getMessageValue("bot.selfTalk", locale);
+    }
+
     public static String changingLockedFactoid(Object arg0, Object arg1, Locale... locale) {
         return MessageFormat.format(getMessageValue("changing.locked.factoid", locale), arg0, arg1);
     }
@@ -85,6 +101,22 @@ public class Sofia {
 
     public static String factoidLocked(Object arg0, Locale... locale) {
         return MessageFormat.format(getMessageValue("factoid.locked", locale), arg0);
+    }
+
+    public static String factoidLoop(Object arg0, Locale... locale) {
+        return MessageFormat.format(getMessageValue("factoid.loop", locale), arg0);
+    }
+
+    public static String factoidPrivmsgChange(Locale... locale) {
+        return getMessageValue("factoid.privmsg.change", locale);
+    }
+
+    public static String factoidTellSyntax(Object arg0, Locale... locale) {
+        return MessageFormat.format(getMessageValue("factoid.tell.syntax", locale), arg0);
+    }
+
+    public static String factoidUnknown(Object arg0, Locale... locale) {
+        return MessageFormat.format(getMessageValue("factoid.unknown", locale), arg0);
     }
 
     public static String historyLength(Locale... locale) {
@@ -135,6 +167,14 @@ public class Sofia {
         return MessageFormat.format(getMessageValue("no.documentation", locale), arg0);
     }
 
+    public static String notAdmin(Object arg0, Locale... locale) {
+        return MessageFormat.format(getMessageValue("not.admin", locale), arg0);
+    }
+
+    public static String notAllowed(Locale... locale) {
+        return getMessageValue("not.allowed", locale);
+    }
+
     public static String ok(Object arg0, Locale... locale) {
         return MessageFormat.format(getMessageValue("ok", locale), arg0);
     }
@@ -157,6 +197,18 @@ public class Sofia {
 
     public static String unknownUser(Locale... locale) {
         return getMessageValue("unknown.user", locale);
+    }
+
+    public static String userNoSharedChannels(Locale... locale) {
+        return getMessageValue("user.no.shared.channels", locale);
+    }
+
+    public static String userNotInChannel(Object arg0, Object arg1, Locale... locale) {
+        return MessageFormat.format(getMessageValue("user.not.in.channel", locale), arg0, arg1);
+    }
+
+    public static String userNotFound(Object arg0, Locale... locale) {
+        return MessageFormat.format(getMessageValue("user.notFound", locale), arg0);
     }
 
     public static String webUrl(Locale... locale) {

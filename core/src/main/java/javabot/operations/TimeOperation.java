@@ -11,7 +11,7 @@ import javabot.Message;
 @SPI(BotOperation.class)
 public class TimeOperation extends BotOperation {
     @Override
-    public List<Message> handleMessage(final IrcEvent event) {
+    public final boolean handleMessage(final MessageEvent event) {
         final String message = event.getMessage();
         final List<Message> responses = new ArrayList<Message>();
         if ("time".equals(message) || "date".equals(message)) {

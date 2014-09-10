@@ -16,7 +16,7 @@ import javabot.model.IrcUser;
 @SPI(BotOperation.class)
 public class DaysUntilOperation extends BotOperation {
   @Override
-  public List<Message> handleMessage(final IrcEvent event) {
+  public final boolean handleMessage(final MessageEvent event) {
     String message = event.getMessage().toLowerCase();
     final List<Message> responses = new ArrayList<Message>();
     if (message.startsWith("days until ")) {

@@ -30,7 +30,7 @@ public class JavadocOperation extends BotOperation {
   private static final int RESULT_LIMIT = 5;
 
   @Override
-  public List<Message> handleMessage(final IrcEvent event) {
+  public final boolean handleMessage(final MessageEvent event) {
     final String message = event.getMessage();
     final List<Message> responses = new ArrayList<>();
     if (message.toLowerCase().startsWith("javadoc")) {

@@ -13,7 +13,7 @@ import static java.lang.String.format;
 @SPI(BotOperation.class)
 public class IgnoreOperation extends BotOperation {
     @Override
-    public List<Message> handleMessage(final IrcEvent event) {
+    public final boolean handleMessage(final MessageEvent event) {
         final String message = event.getMessage();
         Javabot bot = getBot();
         final String[] parts = message.split(" ");

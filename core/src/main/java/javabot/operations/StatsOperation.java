@@ -17,7 +17,7 @@ public class StatsOperation extends BotOperation {
   private int numberOfMessages = 0;
 
   @Override
-  public List<Message> handleMessage(final IrcEvent event) {
+  public final boolean handleMessage(final MessageEvent event) {
     numberOfMessages++;
     final String message = event.getMessage();
     final List<Message> responses = new ArrayList<Message>();

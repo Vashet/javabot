@@ -14,7 +14,7 @@ public class TestJavabot extends Javabot {
 
   @Override
   protected void createIrcBot() {
-    pircBot = new MyPircBot(this, injector) {
+    pircBot = new BotListener(this) {
       @Override
       public String getNick() {
         return BaseTest.TEST_BOT;

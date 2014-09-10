@@ -17,7 +17,7 @@ public class ForgetFactoidOperation extends StandardOperation {
     private FactoidDao factoidDao;
 
     @Override
-    public List<Message> handleMessage(final IrcEvent event) {
+    public final boolean handleMessage(final MessageEvent event) {
         final String channel = event.getChannel();
         String message = event.getMessage();
         final IrcUser sender = event.getSender();

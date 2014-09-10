@@ -24,7 +24,7 @@ public class ShunOperation extends BotOperation {
   @Inject
   private ShunDao shunDao;
 
-  public List<Message> handleMessage(final IrcEvent event) {
+  public final boolean handleMessage(final MessageEvent event) {
     final String message = event.getMessage();
     final List<Message> responses = new ArrayList<Message>();
     if (message.startsWith("shun ")) {

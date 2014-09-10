@@ -8,6 +8,7 @@ import javabot.model.NickServInfo;
 import static javabot.model.NickServInfo.NSERV_DATE_FORMAT;
 import javabot.model.criteria.NickServInfoCriteria;
 import javabot.model.criteria.NickServInfoCriteria.NickServInfoUpdater;
+import org.pircbotx.User;
 
 public class NickServDao extends BaseDao<NickServInfo> {
   protected NickServDao() {
@@ -85,9 +86,9 @@ public class NickServDao extends BaseDao<NickServInfo> {
     return criteria.query().get();
   }
 
-  public void unregister(final String nick) {
+  public void unregister(final User user) {
     NickServInfoCriteria criteria = new NickServInfoCriteria(ds);
-    criteria.nick(nick);
+    criteria.nick(user.getNick());
     criteria.delete();
   }
 }

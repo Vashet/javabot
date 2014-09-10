@@ -36,7 +36,7 @@ public class Message {
   }
 
   public void send(final Javabot bot) {
-    bot.postMessage(this);
+//    bot.postMessage(this);
   }
 
   @Override

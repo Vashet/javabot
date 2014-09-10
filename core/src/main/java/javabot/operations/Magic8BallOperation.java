@@ -35,7 +35,7 @@ public class Magic8BallOperation extends BotOperation {
     };
 
     @Override
-    public List<Message> handleMessage(final IrcEvent event) {
+    public final boolean handleMessage(final MessageEvent event) {
         final String message = event.getMessage().toLowerCase();
         final String channel = event.getChannel();
         final List<Message> messages = new ArrayList<Message>();

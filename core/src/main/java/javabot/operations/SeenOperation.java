@@ -17,7 +17,7 @@ public class SeenOperation extends BotOperation {
   private LogsDao dao;
 
   @Override
-  public List<Message> handleMessage(final IrcEvent event) {
+  public final boolean handleMessage(final MessageEvent event) {
     final String message = event.getMessage();
     final String channel = event.getChannel();
     final IrcUser sender = event.getSender();
