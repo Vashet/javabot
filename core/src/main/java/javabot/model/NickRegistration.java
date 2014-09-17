@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.bson.types.ObjectId;
+import org.pircbotx.User;
 
 @Entity("registrations")
 public class NickRegistration implements Serializable, Persistent {
@@ -19,11 +20,11 @@ public class NickRegistration implements Serializable, Persistent {
   public NickRegistration() {
   }
 
-  public NickRegistration(IrcUser sender, String twitterName) {
+  public NickRegistration(User sender, String twitterName) {
     this.twitterName = twitterName;
     url = UUID.randomUUID().toString();
     nick = sender.getNick();
-    host = sender.getHost();
+    host = sender.getHostmask();
   }
 
   public ObjectId getId() {

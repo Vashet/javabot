@@ -8,11 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 
-/**
- * Created Dec 16, 2008
- *
- * @author <a href="mailto:jlee@antwerkz.com">Justin Lee</a>
- */
 public abstract class UrlOperation extends BotOperation {
     private static final Logger log = LoggerFactory.getLogger(UrlOperation.class);
 

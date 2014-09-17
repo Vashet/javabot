@@ -1,27 +1,21 @@
 package javabot.operations;
 
 import com.antwerkz.maven.SPI;
-import javabot.IrcEvent;
+import com.antwerkz.sofia.Sofia;
 import javabot.Javabot;
-import javabot.Message;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static java.lang.String.format;
+import org.pircbotx.hooks.events.MessageEvent;
 
 @SPI(BotOperation.class)
 public class IgnoreOperation extends BotOperation {
     @Override
     public final boolean handleMessage(final MessageEvent event) {
         final String message = event.getMessage();
-        Javabot bot = getBot();
-        final String[] parts = message.split(" ");
-        final List<Message> responses = new ArrayList<Message>();
         if (message.startsWith("ignore ")) {
-            bot.addIgnore(parts[1]);
-              responses.add(new Message(event.getChannel(), event, format("I am now ignoring %s", parts[1])));
+            final String[] parts = message.split(" ");
+            getBot().addIgnore(parts[1]);
+            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.botIgnoring(parts[1]));
+            return true;
         }
-        return responses;
+        return false;
     }
 }

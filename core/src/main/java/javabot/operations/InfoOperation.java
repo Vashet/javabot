@@ -1,48 +1,45 @@
 package javabot.operations;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import javax.inject.Inject;
-
 import com.antwerkz.maven.SPI;
-import static java.lang.String.format;
-import javabot.IrcEvent;
-import javabot.Message;
+import com.antwerkz.sofia.Sofia;
 import javabot.dao.FactoidDao;
 import javabot.model.Factoid;
+import org.pircbotx.Channel;
+import org.pircbotx.hooks.events.MessageEvent;
+
+import javax.inject.Inject;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Simple operation to pull who added the factoid and when it was added
  */
 @SPI(BotOperation.class)
 public class InfoOperation extends BotOperation {
-  public static final String INFO_DATE_FORMAT = "dd MMM yyyy' at 'KK:mm";
+    public static final String INFO_DATE_FORMAT = "dd MMM yyyy' at 'KK:mm";
 
-  @Inject
-  private FactoidDao dao;
+    @Inject
+    private FactoidDao dao;
 
-  @Override
-  public final boolean handleMessage(final MessageEvent event) {
-    final String message = event.getMessage().toLowerCase();
-    final String channel = event.getChannel();
-    final List<Message> responses = new ArrayList<Message>();
-    if (message.startsWith("info ")) {
-      final String key = message.substring("info ".length());
-      final Factoid factoid = dao.getFactoid(key);
-      if (factoid != null) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(INFO_DATE_FORMAT);
-        LocalDateTime updated = factoid.getUpdated();
-        String formatted = formatter.format(updated);
-        responses.add(new Message(channel, event, format("%s%s was added by: %s on %s and has a literal value of: %s",
-            key, factoid.getLocked() ? "*" : "", factoid.getUserName(), formatted,
-            factoid.getValue())));
-      } else {
-        responses.add(new Message(channel, event, "I have no factoid called \"" + key + "\""));
-      }
+    @Override
+    public final boolean handleMessage(final MessageEvent event) {
+        final String message = event.getMessage().toLowerCase();
+        final Channel channel = event.getChannel();
+        if (message.startsWith("info ")) {
+            final String key = message.substring("info ".length());
+            final Factoid factoid = dao.getFactoid(key);
+            if (factoid != null) {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(INFO_DATE_FORMAT);
+                LocalDateTime updated = factoid.getUpdated();
+                String formatted = formatter.format(updated);
+                getBot().postMessage(channel, event.getUser(), Sofia.factoidInfo(key, factoid.getLocked() ? "*" : "", factoid.getUserName(),
+                                                                                 formatted, factoid.getValue()));
+            } else {
+                getBot().postMessage(channel, event.getUser(), Sofia.factoidUnknown(key));
+            }
+            return true;
+        }
+        return false;
     }
-    return responses;
-  }
 
 }

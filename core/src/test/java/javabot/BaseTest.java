@@ -1,11 +1,8 @@
 package javabot;
 
-import java.util.EnumSet;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-import javax.inject.Inject;
-
 import com.google.inject.Injector;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.jayway.awaitility.Awaitility;
 import com.jayway.awaitility.Duration;
 import javabot.dao.AdminDao;
@@ -15,117 +12,152 @@ import javabot.dao.NickServDao;
 import javabot.model.AdminEvent;
 import javabot.model.AdminEvent.State;
 import javabot.model.Channel;
-import javabot.model.IrcUser;
 import javabot.model.NickServInfo;
+import javabot.model.UserFactory;
+import org.pircbotx.PircBotX;
+import org.pircbotx.User;
 import org.testng.annotations.AfterSuite;
-import org.testng.annotations.Guice;
+import org.testng.annotations.BeforeTest;
 
-@Guice(modules = {JavabotModule.class})
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.io.IOException;
+import java.util.EnumSet;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+
 @SuppressWarnings({"StaticNonFinalField"})
 public class BaseTest {
-  protected static final String TEST_BOT = "jbtestbot";
+    public static final String TEST_NICK = "jbtestuser";
 
-  public static final IrcUser TEST_USER = new IrcUser("jbtestuser", "jbtestuser", "localhost");
+    public EnumSet<State> done = EnumSet.of(State.COMPLETED, State.FAILED);
 
-  public EnumSet<State> done = EnumSet.of(State.COMPLETED, State.FAILED);
+    @Inject
+    private UserFactory userFactory;
 
-  @Inject
-  protected EventDao eventDao;
+    @Inject
+    private EventDao eventDao;
 
-  @Inject
-  private AdminDao adminDao;
+    @Inject
+    private ChannelDao channelDao;
 
-  @Inject
-  private ChannelDao channelDao;
+    @Inject
+    private NickServDao nickServDao;
 
-  @Inject
-  private Injector injector;
+    @Inject
+    private Provider<PircBotX> ircBot;
 
-  public final String ok;
+    @Inject
+    private AdminDao adminDao;
 
-  protected TestJavabot bot;
+    public final String ok;
 
-  @Inject
-  private NickServDao nickServDao;
+    private final User testUser;
 
-  public BaseTest() {
-    Javabot.setPropertiesFile("test-javabot.properties");
-    final String nick = BaseTest.TEST_USER.getNick();
-    ok = "OK, " + nick.substring(0, Math.min(nick.length(), 16)) + ".";
-  }
+    protected TestJavabot bot;
 
-  public void drainMessages() {
-    Awaitility.await("Draining Messages")
-        .atMost(1, TimeUnit.HOURS)
-        .pollInterval(5, TimeUnit.SECONDS)
-        .until(new Callable<Boolean>() {
-          @Override
-          public Boolean call() throws Exception {
-            return getJavabot().getMessages().isEmpty() ;
-          }
-        });
-  }
+    private Injector injector;
 
-  protected TestJavabot createBot() {
-    if (bot == null) {
-      Javabot.validateProperties();
-      bot = injector.getInstance(TestJavabot.class);
-      bot.start();
+    public BaseTest() {
+        injector = com.google.inject.Guice.createInjector(new JavabotTestModule());
+        Javabot bot = injector.getInstance(Javabot.class);
+        injector.injectMembers(this);
+        bot.start();
+        testUser = userFactory.createUser(TEST_NICK, TEST_NICK, "hostmask");
+        if (adminDao.getAdmin(testUser) == null) {
+            adminDao.create(testUser.getNick(), testUser.getRealName(), testUser.getHostmask());
+        }
+
+        final String nick = TEST_NICK;
+        ok = "OK, " + nick.substring(0, Math.min(nick.length(), 16)) + ".";
     }
-    return bot;
-  }
 
-  public final TestJavabot getJavabot() {
-    if (bot == null) {
-      createBot();
+    public User getTestUser() {
+        return testUser;
     }
-    Channel channel = channelDao.get(getJavabotChannel());
-    if (channel == null) {
-      channel = new Channel();
-      channel.setName(getJavabotChannel());
-      channel.setLogged(true);
-      channelDao.save(channel);
+
+    public void drainMessages() {
+        Awaitility.await("Draining Messages")
+                  .atMost(1, TimeUnit.HOURS)
+                  .pollInterval(5, TimeUnit.SECONDS)
+                  .until(() -> getJavabot().getMessages().isEmpty());
     }
-    return bot;
-  }
 
-  protected String getJavabotChannel() {
-    return "#jbunittest";
-  }
-
-  @SuppressWarnings({"EmptyCatchBlock"})
-  protected static void sleep(final int milliseconds) {
-    try {
-      Thread.sleep(milliseconds);
-    } catch (InterruptedException exception) {
+    public final TestJavabot getJavabot() {
+        if (bot == null) {
+            bot = injector.getInstance(TestJavabot.class);
+            bot.start();
+        }
+        Channel channel = channelDao.get(getJavabotChannel().getName());
+        if (channel == null) {
+            channel = new Channel();
+            channel.setName(getJavabotChannel().getName());
+            channel.setLogged(true);
+            channelDao.save(channel);
+        }
+        return bot;
     }
-  }
 
-  @AfterSuite
-  public void shutdown() throws InterruptedException {
-    if (bot != null) {
-      bot.shutdown();
+    public PircBotX getIrcBot() {
+        return ircBot.get();
     }
-  }
 
-  protected void waitForEvent(final AdminEvent event, final String alias, final Duration timeout) {
-    Awaitility.await(alias)
-        .atMost(timeout)
-        .pollInterval(5, TimeUnit.SECONDS)
-        .until(new Callable<Boolean>() {
-          @Override
-          public Boolean call() throws Exception {
-            return done.contains(eventDao.find(event.getId()).getState());
-          }
-        });
-  }
+    protected org.pircbotx.Channel getJavabotChannel() {
+        org.pircbotx.Channel channel = getIrcBot().getUserChannelDao().getChannel("#jbunittest");
+        System.out.println("channel = " + channel);
+        assert channel != null;
+        return channel;
+    }
 
-  protected IrcUser registerIrcUser(final String nick, final String userName, final String host) {
-    final IrcUser bob = new IrcUser(nick, userName, host);
-    NickServInfo info = new NickServInfo(bob);
-    info.setRegistered(info.getRegistered().minusDays(100));
-    nickServDao.clear();
-    nickServDao.save(info);
-    return bob;
-  }
+    @SuppressWarnings({"EmptyCatchBlock"})
+    protected static void sleep(final int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException exception) {
+        }
+    }
+
+    @AfterSuite
+    public void shutdown() throws InterruptedException {
+        if (bot != null) {
+            bot.shutdown();
+        }
+    }
+
+    protected void waitForEvent(final AdminEvent event, final String alias, final Duration timeout) {
+        Awaitility.await(alias)
+                  .atMost(timeout)
+                  .pollInterval(5, TimeUnit.SECONDS)
+                  .until(() -> done.contains(eventDao.find(event.getId()).getState()));
+    }
+
+    protected User registerIrcUser(final String nick, final String userName, final String host) {
+        User bob = userFactory.createUser(nick, userName, host);
+        NickServInfo info = new NickServInfo(bob);
+        info.setRegistered(info.getRegistered().minusDays(100));
+        nickServDao.clear();
+        nickServDao.save(info);
+        return bob;
+    }
+
+    public static class JavabotTestModule extends JavabotModule {
+        private Provider<TestJavabot> botProvider;
+
+        @Override
+        protected void configure() {
+            super.configure();
+            botProvider = binder().getProvider(TestJavabot.class);
+        }
+
+        @Override
+        public Properties getProperties() throws IOException {
+            return loadProperties("test-javabot.properties");
+        }
+
+        @Provides
+        @Singleton
+        public Javabot getJavabot() {
+            return botProvider.get();
+        }
+    }
 }

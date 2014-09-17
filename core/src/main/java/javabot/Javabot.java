@@ -1,12 +1,9 @@
 package javabot;
 
-import ca.grimoire.maven.ArtifactDescription;
-import ca.grimoire.maven.NoArtifactException;
 import com.antwerkz.sofia.Sofia;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import javabot.commands.AdminCommand;
-import javabot.dao.AdminDao;
 import javabot.dao.ChannelDao;
 import javabot.dao.ConfigDao;
 import javabot.dao.EventDao;
@@ -15,7 +12,6 @@ import javabot.dao.ShunDao;
 import javabot.database.UpgradeScript;
 import javabot.model.AdminEvent;
 import javabot.model.AdminEvent.State;
-import javabot.model.Channel;
 import javabot.model.Config;
 import javabot.model.Logs;
 import javabot.model.Logs.Type;
@@ -26,25 +22,17 @@ import javabot.operations.throttle.NickServViolationException;
 import javabot.operations.throttle.Throttler;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
-import org.pircbotx.cap.SASLCapHandler;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.TreeMap;
@@ -56,15 +44,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static org.pircbotx.Configuration.Builder;
-
 public class Javabot {
     public static final Logger log = LoggerFactory.getLogger(Javabot.class);
-
-    private static String propertiesName = "javabot.properties";
-
-    @Inject
-    private ChannelDao channelDao;
 
     @Inject
     private ConfigDao configDao;
@@ -79,22 +60,18 @@ public class Javabot {
     private EventDao eventDao;
 
     @Inject
-    AdminDao adminDao;
-
-    @Inject
     private Throttler throttler;
 
     @Inject
     protected Injector injector;
 
     @Inject
-    private Provider<BotListener> provider;
+    private BotListener botListener;
 
-    private Config config;
+    @Inject
+    private PircBotX ircBot;
 
     private Map<String, BotOperation> allOperations;
-
-    private String password;
 
     private String[] startStrings;
 
@@ -109,16 +86,11 @@ public class Javabot {
 
     private final Set<BotOperation> activeOperations = new TreeSet<>(new OperationComparator());
 
-    private PircBotX ircBot;
-
     public void start() {
         setUpThreads();
-        config = configDao.get();
-        loadOperations(config);
-        loadConfig();
+        loadOperations();
         applyUpgradeScripts();
-        createIrcBot();
-        startStrings = new String[]{ircBot.getNick(), "~"};
+        startStrings = new String[]{getNick(), "~"};
         connect();
     }
 
@@ -140,7 +112,7 @@ public class Javabot {
                 event.setState(State.PROCESSING);
                 eventDao.save(event);
                 injector.injectMembers(event);
-                event.handle(this);
+                event.handle();
                 event.setState(State.COMPLETED);
             } catch (Exception e) {
                 event.setState(State.FAILED);
@@ -149,28 +121,6 @@ public class Javabot {
             event.setCompleted(LocalDateTime.now());
             eventDao.save(event);
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    protected void createIrcBot() {
-        Builder builder = new Builder()
-                              .setName(config.getNick()) //Set the nick of the bot. CHANGE IN YOUR CODE
-                              .setLogin(config.getNick()) //login part of hostmask, eg name:login@host
-                              .setAutoNickChange(true) //Automatically change nick when the current one is in use
-                              .setCapEnabled(true)
-                              .addListener(provider.get())
-                              .setServerHostname(config.getServer())
-                              .setServerPort(config.getPort())
-                              .addCapHandler(new SASLCapHandler(config.getNick(), config.getPassword()));
-        for (Channel channel : channelDao.getChannels()) {
-            if (channel.getKey() == null) {
-                builder.addAutoJoinChannel(channel.getName());
-            } else {
-                builder.addAutoJoinChannel(channel.getName(), channel.getKey());
-            }
-        }
-
-        ircBot = new PircBotX(builder.buildConfiguration());
     }
 
     public void shutdown() {
@@ -192,46 +142,6 @@ public class Javabot {
         }
     }
 
-    public static void validateProperties() {
-        final Properties props = new Properties();
-        try {
-            try (InputStream stream = new FileInputStream(getPropertiesFile())) {
-                props.load(stream);
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException("Please define a javabot.properties file to configure the bot");
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Please define a javabot.properties file to configure the bot");
-        }
-        boolean valid = check(props, "javabot.server");
-        valid &= check(props, "javabot.port");
-        valid &= check(props, "database.name");
-        valid &= check(props, "javabot.nick");
-        valid &= check(props, "javabot.password");
-        valid &= check(props, "javabot.admin.nick");
-        valid &= check(props, "javabot.admin.hostmask");
-        if (!valid) {
-            throw new RuntimeException("Missing configuration parameters");
-        }
-        System.getProperties().putAll(props);
-    }
-
-    public static String getPropertiesFile() {
-        return propertiesName;
-    }
-
-    public static void setPropertiesFile(final String name) {
-        propertiesName = name;
-    }
-
-    static boolean check(final Properties props, final String key) {
-        if (props.get(key) == null) {
-            System.out.printf("Please specify the property %s in javabot.properties\n", key);
-            return false;
-        }
-        return true;
-    }
-
     protected final void applyUpgradeScripts() {
         for (final UpgradeScript script : UpgradeScript.loadScripts()) {
             injector.injectMembers(script);
@@ -239,44 +149,9 @@ public class Javabot {
         }
     }
 
-    public final String loadVersion() {
-        ArtifactDescription description;
-        try {
-            description = ArtifactDescription.locate("javabot", "core");
-            return description.getVersion();
-        } catch (NoArtifactException nae) {
-            try {
-                final File file = new File("target/maven-archiver/pom.properties");
-                if (file.exists()) {
-                    description = ArtifactDescription.locate("javabot", "core", resource -> {
-                        try {
-                            return new FileInputStream(file);
-                        } catch (FileNotFoundException e) {
-                            throw new RuntimeException(e.getMessage(), e);
-                        }
-                    });
-                    return description.getVersion();
-                } else {
-                    return "UNKNOWN";
-                }
-            } catch (NoArtifactException e) {
-                return "UNKNOWN";
-            }
-        }
-    }
-
-    public void loadConfig() {
-        try {
-            setNickPassword(config.getPassword());
-            log.debug("Running with configuration: " + config);
-        } catch (Exception e) {
-            log.debug(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
     @SuppressWarnings({"unchecked"})
-    protected final void loadOperations(final Config config) {
+    protected final void loadOperations() {
+        final Config config = configDao.get();
         allOperations = new TreeMap<>();
         for (final BotOperation op : BotOperation.list()) {
             injector.injectMembers(op);
@@ -408,17 +283,9 @@ public class Javabot {
         }
 
         if (!handled) {
-            postMessage(event.getChannel(), requester, Sofia.factoidUnknown(requester.getNick()));
+            postMessage(event.getChannel(), requester, Sofia.unhandledMessage(requester.getNick()));
         }
         return handled;
-    }
-
-    public String getNickPassword() {
-        return password;
-    }
-
-    public void setNickPassword(final String password) {
-        this.password = password;
     }
 
     public boolean getChannelResponses(final MessageEvent event) {
@@ -452,21 +319,21 @@ public class Javabot {
         return !ignores.contains(sender) && !shunDao.isShunned(sender);
     }
 
-    public void join(final String name, final String key) {
-        org.pircbotx.Channel channel = ircBot.getUserChannelDao().getChannel(name);
+    public String getNick() {
+        return configDao.get().getNick();
     }
 
-    public void leave(String name, String reason) {
-        //        ircBot.getInputParser().partChannel(name, reason);
-    }
 
     public static void main(final String[] args) {
         Injector injector = Guice.createInjector(new JavabotModule());
         if (log.isInfoEnabled()) {
             log.info("Starting Javabot");
         }
-        validateProperties();
         Javabot bot = injector.getInstance(Javabot.class);
         bot.start();
+    }
+
+    public PircBotX getIrcBot() {
+        return ircBot;
     }
 }

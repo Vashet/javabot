@@ -1,22 +1,19 @@
 package javabot.operations;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
 import com.antwerkz.maven.SPI;
-import javabot.IrcEvent;
-import javabot.Message;
+import org.pircbotx.hooks.events.MessageEvent;
+
+import java.util.Calendar;
 
 @SPI(BotOperation.class)
 public class TimeOperation extends BotOperation {
     @Override
     public final boolean handleMessage(final MessageEvent event) {
         final String message = event.getMessage();
-        final List<Message> responses = new ArrayList<Message>();
         if ("time".equals(message) || "date".equals(message)) {
-            responses.add(new Message(event.getChannel(), event, Calendar.getInstance().getTime().toString()));
+            getBot().postMessage(event.getChannel(), event.getUser(), Calendar.getInstance().getTime().toString());
+            return true;
         }
-        return responses;
+        return false;
     }
 }

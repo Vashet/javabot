@@ -1,5 +1,6 @@
 package javabot;
 
+import javabot.dao.AdminDao;
 import javabot.dao.ChannelDao;
 import javabot.dao.LogsDao;
 import javabot.dao.NickServDao;
@@ -7,7 +8,6 @@ import javabot.model.Channel;
 import javabot.model.Logs;
 import javabot.operations.throttle.NickServViolationException;
 import javabot.operations.throttle.Throttler;
-import org.pircbotx.Configuration.BotFactory;
 import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.ActionEvent;
@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,18 +42,18 @@ public class BotListener extends ListenerAdapter {
     private LogsDao logsDao;
 
     @Inject
-    private PircBotX ircBot;
-
-    @Inject
     private ChannelDao channelDao;
 
-    private final List<String> nickServ = new ArrayList<>();
-    private final Javabot javabot;
+    @Inject
+    private AdminDao adminDao;
 
     @Inject
-    public BotListener(final Javabot javabot) {
-        this.javabot = javabot;
-    }
+    private Provider<Javabot> javabotProvider;
+
+    private final List<String> nickServ = new ArrayList<>();
+
+    @Inject
+    private Provider<PircBotX> ircBot;
 
     public void log(final String string) {
         if (Javabot.log.isInfoEnabled()) {
@@ -60,12 +61,9 @@ public class BotListener extends ListenerAdapter {
         }
     }
 
-    public String getNick() {
-        return ircBot.getNick();
-    }
-
     @Override
     public void onMessage(final MessageEvent event) {
+        Javabot javabot = javabotProvider.get();
         javabot.executors.execute(() -> javabot.processMessage(event));
     }
 
@@ -90,11 +88,13 @@ public class BotListener extends ListenerAdapter {
 
     @Override
     public void onInvite(final InviteEvent event) {
-        org.pircbotx.Channel toJoin = event.getBot().getUserChannelDao().getChannel(event.getChannel());
-        final Channel channel = channelDao.get(toJoin.getName());
+        final Channel channel = channelDao.get(event.getChannel());
         if (channel != null) {
-            channel.join(javabot);
-            new BotFactory().createOutputChannel(event.getBot(), toJoin);
+            if (channel.getKey() == null) {
+                ircBot.get().sendIRC().joinChannel(channel.getName());
+            } else {
+                ircBot.get().sendIRC().joinChannel(channel.getName(), channel.getKey());
+            }
         }
     }
 
@@ -132,12 +132,14 @@ public class BotListener extends ListenerAdapter {
 
     @Override
     public void onPrivateMessage(PrivateMessageEvent event) {
-        if (javabot.adminDao.isAdmin(event.getUser()) || javabot.isOnCommonChannel(event.getUser())) {
+        Javabot javabot = javabotProvider.get();
+        if (adminDao.isAdmin(event.getUser()) || javabot.isOnCommonChannel(event.getUser())) {
             javabot.executors.execute(() -> {
                 javabot.logMessage(null, event.getUser(), event.getMessage());
                 try {
                     if (!throttler.isThrottled(event.getUser())) {
-                        javabot.getResponses(new MessageEvent<>(event.getBot(), null, event.getUser(), event.getMessage()), event.getUser());
+                        javabot.getResponses(new MessageEvent<>(event.getBot(), null, event.getUser(), event.getMessage()),
+                                             event.getUser());
                     }
                 } catch (NickServViolationException e) {
                     event.getUser().send().message(e.getMessage());
@@ -155,5 +157,9 @@ public class BotListener extends ListenerAdapter {
     public void onKick(final KickEvent event) {
         logsDao.logMessage(Logs.Type.KICK, event.getUser().getNick(), event.getChannel().getName(),
                            String.format(" kicked %s (%s)", event.getRecipient().getNick(), event.getReason()));
+    }
+
+    public PircBotX getIrcBot() {
+        return ircBot.get();
     }
 }

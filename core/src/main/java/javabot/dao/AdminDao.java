@@ -37,7 +37,7 @@ public class AdminDao extends BaseDao<Admin> {
 
   public Admin getAdmin(final User user) {
     AdminCriteria adminCriteria = new AdminCriteria(ds);
-    adminCriteria.userName().equal(user.getNick());
+    adminCriteria.ircName(user.getNick());
     return adminCriteria.query().get();
   }
 

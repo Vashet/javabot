@@ -6,6 +6,8 @@ import java.util.List;
 import com.antwerkz.maven.SPI;
 import javabot.IrcEvent;
 import javabot.Message;
+import org.pircbotx.Channel;
+import org.pircbotx.hooks.events.MessageEvent;
 
 @SPI(BotOperation.class)
 public class Magic8BallOperation extends BotOperation {
@@ -37,11 +39,11 @@ public class Magic8BallOperation extends BotOperation {
     @Override
     public final boolean handleMessage(final MessageEvent event) {
         final String message = event.getMessage().toLowerCase();
-        final String channel = event.getChannel();
-        final List<Message> messages = new ArrayList<Message>();
+        final Channel channel = event.getChannel();
         if (message.startsWith("should i ") || message.startsWith("magic8 ")) {
-            messages.add(new Message(channel, event, responses[((int) (Math.random() * responses.length))]));
+            getBot().postMessage(channel, event.getUser(), responses[((int) (Math.random() * responses.length))]);
+            return true;
         }
-        return messages;
+        return false;
     }
 }

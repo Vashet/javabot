@@ -8,11 +8,6 @@ import org.pircbotx.hooks.events.MessageEvent;
 
 import javax.inject.Inject;
 
-/**
- * Created Dec 17, 2008
- *
- * @author <a href="mailto:jlee@antwerkz.com">Justin Lee</a>
- */
 @SPI({AdminCommand.class})
 public class AddAdmin extends AdminCommand {
     @Inject
