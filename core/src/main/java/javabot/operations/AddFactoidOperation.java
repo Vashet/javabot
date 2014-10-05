@@ -2,12 +2,12 @@ package javabot.operations;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
+import javabot.Message;
 import javabot.dao.FactoidDao;
 import javabot.dao.LogsDao;
 import javabot.model.Factoid;
 import javabot.model.Logs.Type;
 import org.pircbotx.Channel;
-import org.pircbotx.hooks.events.MessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,13 +25,13 @@ public class AddFactoidOperation extends StandardOperation {
     private LogsDao logDao;
 
     @Override
-    public final boolean handleMessage(final MessageEvent event) {
+    public boolean handleMessage(final Message event) {
         String message = event.getMessage();
         final Channel channel = event.getChannel();
         boolean handled = false;
         if (message.startsWith("no ") || message.startsWith("no, ")) {
             if (!channel.getName().startsWith("#") && !isAdminUser(event.getUser())) {
-                getBot().postMessage(channel, event.getUser(), "Sorry, factoid changes are not allowed in private messages.");
+                getBot().postMessage(channel, event.getUser(), Sofia.privmsgChange());
                 handled = true;
             } else {
                 message = message.substring(2);
@@ -48,7 +48,7 @@ public class AddFactoidOperation extends StandardOperation {
         return handled;
     }
 
-    private boolean updateFactoid(final MessageEvent event, final String message) {
+    private boolean updateFactoid(final Message event, final String message) {
         final int is = message.indexOf(" is ");
         boolean handled = false;
         if (is != -1) {
@@ -65,7 +65,7 @@ public class AddFactoidOperation extends StandardOperation {
                         if (admin) {
                             handled = updateExistingFactoid(event, message, factoid, is, key);
                         } else {
-                            logDao.logMessage(Type.MESSAGE, event.getUser().getNick(), event.getChannel().getName(),
+                            logDao.logMessage(Type.MESSAGE, event.getChannel(), event.getUser(),
                                               Sofia.changingLockedFactoid(event.getUser(), key));
                             getBot().postMessage(event.getChannel(), event.getUser(), Sofia.factoidLocked(event.getUser()));
                             handled = true;
@@ -79,7 +79,7 @@ public class AddFactoidOperation extends StandardOperation {
         return handled;
     }
 
-    private boolean addFactoid(final MessageEvent event, final String message) {
+    private boolean addFactoid(final Message event, final String message) {
         boolean handled = false;
         if (message.toLowerCase().contains(" is ")) {
             if (!event.getChannel().getName().startsWith("#") && !isAdminUser(event.getUser())) {
@@ -118,10 +118,10 @@ public class AddFactoidOperation extends StandardOperation {
         return handled;
     }
 
-    private boolean updateExistingFactoid(final MessageEvent event, final String message, final Factoid factoid,
+    private boolean updateExistingFactoid(final Message event, final String message, final Factoid factoid,
                                           final int is, final String key) {
         final String newValue = message.substring(is + 4);
-        logDao.logMessage(Type.MESSAGE, event.getUser().getNick(), event.getChannel().getName(),
+        logDao.logMessage(Type.MESSAGE, event.getChannel(), event.getUser(),
                           Sofia.factoidChanged(event.getUser(), key, factoid.getValue(), newValue, event.getChannel()));
         factoid.setValue(newValue);
         factoid.setUpdated(LocalDateTime.now());

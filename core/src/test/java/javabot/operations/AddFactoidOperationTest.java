@@ -49,7 +49,7 @@ public class AddFactoidOperationTest extends BaseOperationTest {
     public void duplicateAdd() throws IOException {
         final String message = "~test pong is pong";
         testMessage(message, ok);
-        testMessage(message, String.format("I already have a factoid named '%s', %s", "test pong", getTestUser()));
+        testMessage(message, Sofia.factoidExists("test pong", getTestUser()));
         forgetFactoid("test pong");
     }
 
@@ -60,8 +60,7 @@ public class AddFactoidOperationTest extends BaseOperationTest {
 
     public void addLog() {
         testMessage("~12345 is 12345", ok);
-        Assert.assertTrue(
-                             changeDao.findLog(String.format("%s added '12345' with a value of '12345'", getTestUser())));
+        Assert.assertTrue(changeDao.findLog(Sofia.factoidAdded(getTestUser().getNick(), "12345", "12345")));
         forgetFactoid("12345");
     }
 

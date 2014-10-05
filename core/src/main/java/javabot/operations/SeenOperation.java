@@ -6,13 +6,9 @@ import javabot.Message;
 import javabot.Seen;
 import javabot.dao.LogsDao;
 import org.pircbotx.Channel;
-import org.pircbotx.User;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import javax.inject.Inject;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 @SPI(BotOperation.class)
 public class SeenOperation extends BotOperation {
@@ -20,13 +16,13 @@ public class SeenOperation extends BotOperation {
     private LogsDao dao;
 
     @Override
-    public final boolean handleMessage(final MessageEvent event) {
+    public boolean handleMessage(final Message event) {
         final String message = event.getMessage();
         final Channel channel = event.getChannel();
         if ("seen ".equalsIgnoreCase(message.substring(0, Math.min(message.length(), 5)))) {
             final String key = message.substring("seen ".length());
-            if (dao.isSeen(key, channel.getName())) {
-                Seen seen = dao.getSeen(key, channel.getName());
+            if (dao.isSeen(channel.getName(), key)) {
+                Seen seen = dao.getSeen(channel.getName(), key);
                 getBot().postMessage(channel, event.getUser(),
                                      Sofia.seenLast(event.getUser().getNick(), key, DateFormat.getInstance().format(seen.getUpdated()),
                                                     seen.getMessage()));

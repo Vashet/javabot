@@ -4,7 +4,7 @@ import ca.grimoire.maven.ArtifactDescription;
 import ca.grimoire.maven.NoArtifactException;
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
-import org.pircbotx.hooks.events.MessageEvent;
+import javabot.Message;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,7 +13,7 @@ import java.io.FileNotFoundException;
 @SPI(StandardOperation.class)
 public class VersionOperation extends StandardOperation {
     @Override
-    public final boolean handleMessage(final MessageEvent event) {
+    public boolean handleMessage(final Message event) {
         final String message = event.getMessage();
         if ("version".equalsIgnoreCase(message)) {
             getBot().postMessage(event.getChannel(), event.getUser(), Sofia.botVersion(loadVersion()));

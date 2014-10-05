@@ -96,7 +96,7 @@ public class KarmaOperationTest extends BaseOperationTest {
     public void noncontiguousNameAddKarmaWithComment() {
         final String target = "foo " + new Date().getTime();
         final int karma = getKarma(userFactory.createUser(target, target, "localhost")) + 1;
-        testMessage("~" + target + "++ hey coolio", Sofia.karmaOthersValue(target, karma, getTestUser()));
+        testMessage("~" + target + "++ hey coolio", Sofia.karmaOthersValue(target, karma, getTestUser().getNick()));
         Assert.assertTrue(changeDao.findLog(Sofia.karmaChanged(getTestUser(), target, karma)));
         karmaDao.delete(karmaDao.find(target).getId());
     }
@@ -104,7 +104,7 @@ public class KarmaOperationTest extends BaseOperationTest {
     public void shortNameAddKarma() {
         final String target = "a"; // shortest possible name
         final int karma = getKarma(userFactory.createUser(target, target, "localhost")) + 1;
-        testMessage("~" + target + "++", Sofia.karmaOthersValue(target, karma, getTestUser()));
+        testMessage("~" + target + "++", Sofia.karmaOthersValue(target, karma, getTestUser().getNick()));
         Assert.assertTrue(changeDao.findLog(Sofia.karmaChanged(getTestUser(), target, karma)));
         karmaDao.delete(karmaDao.find(target).getId());
     }

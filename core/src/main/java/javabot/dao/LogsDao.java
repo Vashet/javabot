@@ -1,9 +1,11 @@
 package javabot.dao;
 
 import javabot.Seen;
-import javabot.model.Channel;
 import javabot.model.Logs;
+import javabot.model.Logs.Type;
 import javabot.model.criteria.LogsCriteria;
+import org.pircbotx.Channel;
+import org.pircbotx.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,23 +29,26 @@ public class LogsDao extends BaseDao<Logs> {
         super(Logs.class);
     }
 
-    public void logMessage(final Logs.Type type, final String nick, final String channel, final String message) {
+    public void logMessage(final Type type, final Channel channel, final User user, final String message) {
+        System.out.println("type = [" + type + "], channel = [" + channel + "], user = [" + user + "], message = [" + message + "]");
         final Logs logMessage = new Logs();
         logMessage.setType(type);
-        logMessage.setNick(nick);
+        if (user != null) {
+            logMessage.setNick(user.getNick());
+        }
         if (channel != null) {
-            logMessage.setChannel(channel.toLowerCase());
+            logMessage.setChannel(channel.getName().toLowerCase());
         }
         logMessage.setMessage(message);
         logMessage.setUpdated(LocalDateTime.now());
         save(logMessage);
     }
 
-    public boolean isSeen(final String nick, final String channel) {
-        return getSeen(nick, channel) != null;
+    public boolean isSeen(final String channel, final String nick) {
+        return getSeen(channel, nick) != null;
     }
 
-    public Seen getSeen(final String nick, final String channel) {
+    public Seen getSeen(final String channel, final String nick) {
         LogsCriteria criteria = new LogsCriteria(ds);
         criteria.upperNick().equal(nick.toUpperCase());
         criteria.channel().equal(channel);
@@ -72,7 +77,7 @@ public class LogsDao extends BaseDao<Logs> {
     }
 
     public List<Logs> findByChannel(String name, LocalDateTime date, Boolean showAll) {
-        Channel channel = channelDao.get(name);
+        javabot.model.Channel channel = channelDao.get(name);
         if (channel != null && (showAll || channel.getLogged())) {
             return dailyLog(name, date, showAll || channel.getLogged());
         } else {

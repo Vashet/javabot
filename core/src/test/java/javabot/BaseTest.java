@@ -1,32 +1,35 @@
 package javabot;
 
-import com.google.inject.Injector;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
 import com.jayway.awaitility.Awaitility;
 import com.jayway.awaitility.Duration;
 import javabot.dao.AdminDao;
+import javabot.dao.ChangeDao;
 import javabot.dao.ChannelDao;
 import javabot.dao.EventDao;
+import javabot.dao.LogsDao;
 import javabot.dao.NickServDao;
 import javabot.model.AdminEvent;
 import javabot.model.AdminEvent.State;
+import javabot.model.Change;
 import javabot.model.Channel;
+import javabot.model.Logs;
 import javabot.model.NickServInfo;
 import javabot.model.UserFactory;
+import org.mongodb.morphia.Datastore;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Guice;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import java.io.IOException;
 import java.util.EnumSet;
-import java.util.Properties;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@SuppressWarnings({"StaticNonFinalField"})
+@Guice(modules = {JavabotTestModule.class})
 public class BaseTest {
     public static final String TEST_NICK = "jbtestuser";
 
@@ -36,10 +39,16 @@ public class BaseTest {
     private UserFactory userFactory;
 
     @Inject
+    private Datastore datastore;
+
+    @Inject
     private EventDao eventDao;
 
     @Inject
     private ChannelDao channelDao;
+
+    @Inject
+    private LogsDao logsDao;
 
     @Inject
     private NickServDao nickServDao;
@@ -50,44 +59,27 @@ public class BaseTest {
     @Inject
     private AdminDao adminDao;
 
-    public final String ok;
+    @Inject
+    private ChangeDao changeDao;
 
-    private final User testUser;
+    @Inject
+    private TestJavabot bot;
 
-    protected TestJavabot bot;
+    @Inject
+    private Messages messages;
 
-    private Injector injector;
+    public String ok;
 
-    public BaseTest() {
-        injector = com.google.inject.Guice.createInjector(new JavabotTestModule());
-        Javabot bot = injector.getInstance(Javabot.class);
-        injector.injectMembers(this);
+    private User testUser;
+
+    @BeforeTest
+    public void setup() {
         bot.start();
-        testUser = userFactory.createUser(TEST_NICK, TEST_NICK, "hostmask");
+        User testUser = getTestUser();
         if (adminDao.getAdmin(testUser) == null) {
             adminDao.create(testUser.getNick(), testUser.getRealName(), testUser.getHostmask());
         }
 
-        final String nick = TEST_NICK;
-        ok = "OK, " + nick.substring(0, Math.min(nick.length(), 16)) + ".";
-    }
-
-    public User getTestUser() {
-        return testUser;
-    }
-
-    public void drainMessages() {
-        Awaitility.await("Draining Messages")
-                  .atMost(1, TimeUnit.HOURS)
-                  .pollInterval(5, TimeUnit.SECONDS)
-                  .until(() -> getJavabot().getMessages().isEmpty());
-    }
-
-    public final TestJavabot getJavabot() {
-        if (bot == null) {
-            bot = injector.getInstance(TestJavabot.class);
-            bot.start();
-        }
         Channel channel = channelDao.get(getJavabotChannel().getName());
         if (channel == null) {
             channel = new Channel();
@@ -95,6 +87,30 @@ public class BaseTest {
             channel.setLogged(true);
             channelDao.save(channel);
         }
+
+        datastore.delete(logsDao.getQuery(Logs.class));
+        datastore.delete(changeDao.getQuery(Change.class));
+
+        ok = "OK, " + TEST_NICK.substring(0, Math.min(TEST_NICK.length(), 16)) + ".";
+    }
+
+    @BeforeMethod
+    public void clearMessages() {
+        messages.get();
+    }
+
+    public User getTestUser() {
+        if (testUser == null) {
+            testUser = userFactory.createUser(TEST_NICK, TEST_NICK, "hostmask");
+        }
+        return testUser;
+    }
+
+    public List<Message> getMessages() {
+        return messages.get();
+    }
+
+    public final TestJavabot getJavabot() {
         return bot;
     }
 
@@ -140,24 +156,4 @@ public class BaseTest {
         return bob;
     }
 
-    public static class JavabotTestModule extends JavabotModule {
-        private Provider<TestJavabot> botProvider;
-
-        @Override
-        protected void configure() {
-            super.configure();
-            botProvider = binder().getProvider(TestJavabot.class);
-        }
-
-        @Override
-        public Properties getProperties() throws IOException {
-            return loadProperties("test-javabot.properties");
-        }
-
-        @Provides
-        @Singleton
-        public Javabot getJavabot() {
-            return botProvider.get();
-        }
-    }
 }

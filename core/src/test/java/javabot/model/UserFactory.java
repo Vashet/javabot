@@ -20,5 +20,10 @@ public class UserFactory {
             setHostmask(host);
             setLogin(login);
         }
+
+        @Override
+        public String toString() {
+            return getNick();
+        }
     }
 }

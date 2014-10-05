@@ -195,6 +195,10 @@ public class Sofia {
         return getMessageValue("email", locale);
     }
 
+    public static String factoidAdded(Object arg0, Object arg1, Object arg2, Locale... locale) {
+        return MessageFormat.format(getMessageValue("factoid.added", locale), arg0, arg1, arg2);
+    }
+
     public static String factoidChanged(Object arg0, Object arg1, Object arg2, Object arg3, Object arg4, Locale... locale) {
         return MessageFormat.format(getMessageValue("factoid.changed", locale), arg0, arg1, arg2, arg3, arg4);
     }

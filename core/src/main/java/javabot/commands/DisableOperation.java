@@ -2,9 +2,9 @@ package javabot.commands;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
+import javabot.Message;
 import javabot.dao.ConfigDao;
 import javabot.model.Config;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import javax.inject.Inject;
 
@@ -17,7 +17,7 @@ public class DisableOperation extends OperationsCommand {
     private ConfigDao configDao;
 
     @Override
-    public void execute(final MessageEvent event) {
+    public void execute(final Message event) {
         if (getBot().disableOperation(name)) {
             Config config = configDao.get();
             config.getOperations().remove(name);

@@ -1,9 +1,7 @@
 package javabot.operations;
 
 import com.antwerkz.sofia.Sofia;
-import javabot.BaseTest;
 import javabot.dao.FactoidDao;
-import org.pircbotx.PircBotX;
 import org.testng.annotations.Test;
 
 import javax.inject.Inject;
@@ -12,11 +10,9 @@ import javax.inject.Inject;
 public class TellOperationTest extends BaseOperationTest {
     @Inject
     private FactoidDao dao;
-    @Inject
-    private PircBotX ircBot;
 
     public void shortcut() {
-        final String nick = ircBot.getNick();
+        final String nick = getJavabot().getNick();
         dao.delete(nick, "shortcut");
         try {
             final String message = "I'm a shortcut response";
@@ -29,7 +25,7 @@ public class TellOperationTest extends BaseOperationTest {
     }
 
     public void unknownTell() {
-        dao.delete(ircBot.getNick(), "shortcut");
+        dao.delete(getJavabot().getNick(), "shortcut");
         testMessage(String.format("~~ %s shortcut", getTestUser()), Sofia.unhandledMessage(getTestUser().getNick()));
     }
 }

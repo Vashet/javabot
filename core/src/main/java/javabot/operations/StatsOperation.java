@@ -2,8 +2,8 @@ package javabot.operations;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
+import javabot.Message;
 import javabot.dao.FactoidDao;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import javax.inject.Inject;
 import java.time.Duration;
@@ -19,7 +19,7 @@ public class StatsOperation extends BotOperation {
     private int numberOfMessages = 0;
 
     @Override
-    public final boolean handleMessage(final MessageEvent event) {
+    public boolean handleMessage(final Message event) {
         numberOfMessages++;
         final String message = event.getMessage();
         if ("stats".equalsIgnoreCase(message)) {

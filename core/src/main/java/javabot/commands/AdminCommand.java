@@ -2,6 +2,7 @@ package javabot.commands;
 
 import com.antwerkz.sofia.Sofia;
 import javabot.Javabot;
+import javabot.Message;
 import javabot.operations.BotOperation;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -11,11 +12,11 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang.StringUtils;
 import org.pircbotx.PircBotX;
-import org.pircbotx.hooks.events.MessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,21 +28,21 @@ public abstract class AdminCommand extends BotOperation {
     protected List<String> args;
 
     @Inject
-    private Javabot javabot;
+    private Provider<Javabot> javabot;
 
     @Inject
-    private PircBotX pircBot;
+    private Provider<PircBotX> pircBot;
 
     public Javabot getJavabot() {
-        return javabot;
+        return javabot.get();
     }
 
-    public PircBotX getPircBot() {
-        return pircBot;
+    public PircBotX getIrcBot() {
+        return pircBot.get();
     }
 
     @Override
-    public final boolean handleMessage(final MessageEvent event) {
+    public final boolean handleMessage(final Message event) {
         boolean handled = false;
         String message = event.getMessage();
         if (message.toLowerCase().startsWith("admin ")) {
@@ -75,7 +76,7 @@ public abstract class AdminCommand extends BotOperation {
         }
     }
 
-    public abstract void execute(MessageEvent event);
+    public abstract void execute(Message event);
 
     public String getUsage() {
         final Options options = getOptions();

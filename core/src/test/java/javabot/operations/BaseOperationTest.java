@@ -2,8 +2,8 @@ package javabot.operations;
 
 import com.antwerkz.sofia.Sofia;
 import javabot.BaseTest;
+import javabot.Message;
 import org.pircbotx.User;
-import org.pircbotx.hooks.events.MessageEvent;
 import org.testng.Assert;
 
 import java.util.Arrays;
@@ -11,9 +11,9 @@ import java.util.List;
 
 public abstract class BaseOperationTest extends BaseTest {
     protected void scanForResponse(final String message, final String target) {
-        final List<MessageEvent> list = sendMessage(message);
+        final List<Message> list = sendMessage(message);
         boolean found = false;
-        for (final MessageEvent response : list) {
+        for (final Message response : list) {
             found |= response.getMessage().contains(target);
         }
         Assert.assertTrue(found, String.format("Did not find \n'%s' in \n'%s'", target, list));
@@ -27,7 +27,7 @@ public abstract class BaseOperationTest extends BaseTest {
         compareResults(sendMessage(user, message), responses);
     }
 
-    private void compareResults(final List<MessageEvent> list, final String[] responses) {
+    private void compareResults(final List<Message> list, final String[] responses) {
         Assert.assertEquals(list.size(), responses.length, String.format("Should get expected response count back. "
                                                                          + "\n** expected: \n%s"
                                                                          + "\n** got: \n%s", Arrays.toString(responses), list));
@@ -37,19 +37,19 @@ public abstract class BaseOperationTest extends BaseTest {
         Assert.assertTrue(list.isEmpty(), "All responses should be matched.");
     }
 
-    protected List<MessageEvent> sendMessage(final String message) {
+    protected List<Message> sendMessage(final String message) {
         return sendMessage(getTestUser(), message);
     }
 
-    protected List<MessageEvent> sendMessage(final User testUser, final String message) {
-        getJavabot().processMessage(new MessageEvent<>(getIrcBot(), getJavabotChannel(), testUser, message));
-        return getJavabot().getMessages();
+    protected List<Message> sendMessage(final User testUser, final String message) {
+        getJavabot().processMessage(new Message(getJavabotChannel(), testUser, message));
+        return getMessages();
     }
 
     protected void testMessageList(final String message, final List<String> responses) {
-        final List<MessageEvent> list = sendMessage(message);
+        final List<Message> list = sendMessage(message);
         boolean found = false;
-        for (final MessageEvent response : list) {
+        for (final Message response : list) {
             found |= responses.contains(response.getMessage());
         }
         Assert.assertTrue(found, String.format("Should get one response from the list of possibilities"

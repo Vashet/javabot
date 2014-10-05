@@ -1,12 +1,12 @@
 package javabot.admin;
 
 import com.jayway.awaitility.Awaitility;
+import javabot.Message;
+import javabot.Messages;
 import javabot.commands.AdminCommand;
-import javabot.dao.ConfigDao;
 import javabot.operations.BaseOperationTest;
 import javabot.operations.BotOperation;
 import javabot.operations.StandardOperation;
-import org.pircbotx.hooks.events.MessageEvent;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -17,14 +17,15 @@ import java.util.concurrent.TimeUnit;
 
 @Test
 public class AdminOperationTest extends BaseOperationTest {
+
     @Inject
-    ConfigDao dao;
+    private Messages messages;
 
     public void disableOperations() {
-        final List<MessageEvent> messages = sendMessage("~admin listOperations");
+        final List<Message> messages = sendMessage("~admin listOperations");
         List<String> disabled = new ArrayList<>();
         try {
-            for (final String name : messages.get(3).getMessage().split(",")) {
+            for (final String name : messages.get(2).getMessage().split(",")) {
                 final String opName = name.trim().split(" ")[0].trim();
                 disabled.add(opName);
                 sendMessage("~admin disableOperation --name=" + opName);
@@ -50,18 +51,15 @@ public class AdminOperationTest extends BaseOperationTest {
 
     @Test(dependsOnMethods = {"disableOperations"})
     public void enableOperations() {
-        List<MessageEvent> messages = getJavabot().getMessages();
-        for (MessageEvent message : messages) {
-            System.out.println("message = " + message);
-        }
-        final String message = sendMessage("~admin listOperations").get(1).getMessage();
+        List<Message> list = sendMessage("~admin listOperations");
+        final String message = list.get(2).getMessage();
         for (final String name : message.split(",")) {
             final String opName = name.trim().split(" ")[0];
             sendMessage("~admin enableOperation --name=" + opName);
             Awaitility.await("~admin enableOperation --name=" + opName)
                       .atMost(60, TimeUnit.SECONDS)
                       .until(() -> findOperation(opName) != null);
-            getJavabot().getMessages();
+            messages.get();
         }
     }
 }

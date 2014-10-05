@@ -2,13 +2,15 @@ package javabot.operations;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
+import javabot.Message;
 import javabot.dao.FactoidDao;
 import javabot.model.Factoid;
 import org.pircbotx.Channel;
+import org.pircbotx.PircBotX;
 import org.pircbotx.User;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,12 +19,15 @@ public class GetFactoidOperation extends StandardOperation {
     @Inject
     private FactoidDao factoidDao;
 
+    @Inject
+    private Provider<PircBotX> ircBot;
+
     @Override
-    public boolean handleMessage(final MessageEvent event) {
+    public boolean handleMessage(final Message event) {
         return tell(event) || getFactoid(null, event, new HashSet<>());
     }
 
-    private boolean getFactoid(final TellSubject subject, final MessageEvent event, final Set<String> backtrack) {
+    private boolean getFactoid(final TellSubject subject, final Message event, final Set<String> backtrack) {
         String message = event.getMessage();
         if (message.endsWith(".") || message.endsWith("?") || message.endsWith("!")) {
             message = message.substring(0, message.length() - 1);
@@ -37,7 +42,7 @@ public class GetFactoidOperation extends StandardOperation {
         return factoid != null && getResponse(subject, event, backtrack, params, factoid);
     }
 
-    private boolean getResponse(final TellSubject subject, final MessageEvent event, final Set<String> backtrack,
+    private boolean getResponse(final TellSubject subject, final Message event, final Set<String> backtrack,
                                 final String replacedValue, final Factoid factoid) {
         String sender = event.getUser().getNick();
         final String message = factoid.evaluate(subject, sender, replacedValue);
@@ -61,7 +66,7 @@ public class GetFactoidOperation extends StandardOperation {
         }
     }
 
-    private boolean tell(final MessageEvent event) {
+    private boolean tell(final Message event) {
         final String message = event.getMessage();
         final Channel channel = event.getChannel();
         final User sender = event.getUser();
@@ -78,7 +83,7 @@ public class GetFactoidOperation extends StandardOperation {
                         user = sender;
                     }
                     final String thing = tellSubject.getSubject();
-                    if (user.getNick().equalsIgnoreCase(event.getBot().getNick())) {
+                    if (user.getNick().equalsIgnoreCase(ircBot.get().getNick())) {
                         getBot().postMessage(event.getChannel(), event.getUser(), Sofia.botSelfTalk());
                         handled = true;
                     } else {
@@ -92,8 +97,7 @@ public class GetFactoidOperation extends StandardOperation {
                             getBot().postMessage(event.getChannel(), event.getUser(), Sofia.notAllowed());
                             handled = true;
                         } else {
-                            handled = getBot().getResponses(new MessageEvent<>(event.getBot(), channel, user, thing),
-                                                            event.getUser());
+                            handled = getBot().getResponses(new Message(channel, user, thing), event.getUser());
                         }
                     }
                 }
@@ -102,7 +106,7 @@ public class GetFactoidOperation extends StandardOperation {
         return handled;
     }
 
-    private TellSubject parseTellSubject(final MessageEvent event) {
+    private TellSubject parseTellSubject(final Message event) {
         String message = event.getMessage();
         if (message.startsWith("tell ")) {
             return parseLonghand(event);
@@ -110,7 +114,7 @@ public class GetFactoidOperation extends StandardOperation {
         return parseShorthand(event);
     }
 
-    private TellSubject parseLonghand(final MessageEvent event) {
+    private TellSubject parseLonghand(final Message event) {
         String message = event.getMessage();
         final String body = message.substring("tell ".length());
         final String nick = body.substring(0, body.indexOf(" "));
@@ -119,10 +123,10 @@ public class GetFactoidOperation extends StandardOperation {
             return null;
         }
         final String thing = body.substring(about + "about ".length());
-        return new TellSubject(event.getBot().getUserChannelDao().getUser(nick), thing);
+        return new TellSubject(ircBot.get().getUserChannelDao().getUser(nick), thing);
     }
 
-    private TellSubject parseShorthand(final MessageEvent event) {
+    private TellSubject parseShorthand(final Message event) {
         String target = event.getMessage();
         for (final String start : getBot().getStartStrings()) {
             if (target.startsWith(start)) {
@@ -130,7 +134,7 @@ public class GetFactoidOperation extends StandardOperation {
             }
         }
         final int space = target.indexOf(' ');
-        User user = event.getBot().getUserChannelDao().getUser(target.substring(0, space));
+        User user = ircBot.get().getUserChannelDao().getUser(target.substring(0, space));
         return space < 0 ? null : new TellSubject(user, target.substring(space + 1).trim());
     }
 

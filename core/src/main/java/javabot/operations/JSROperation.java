@@ -2,9 +2,9 @@ package javabot.operations;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
+import javabot.Message;
 import javabot.operations.locator.JCPJSRLocator;
 import org.pircbotx.Channel;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import javax.inject.Inject;
 
@@ -14,7 +14,7 @@ public class JSROperation extends BotOperation {
     JCPJSRLocator locator;
 
     @Override
-    public final boolean handleMessage(final MessageEvent event) {
+    public boolean handleMessage(final Message event) {
         final String message = event.getMessage().toLowerCase();
         final Channel channel = event.getChannel();
         if ("jsr".equals(message)) {

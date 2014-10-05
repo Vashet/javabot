@@ -1,46 +1,45 @@
 package javabot;
 
-import javabot.model.IrcUser;
+import org.pircbotx.Channel;
+import org.pircbotx.User;
 
 public class Message {
-  private final String destination;
+    private final Channel channel;
+    private final User user;
+    private String message;
 
-  private String message;
+    public Message(final Channel dest, final User user, final String message) {
+        channel = dest;
+        this.user = user;
+        this.message = message;
+    }
 
-  private IrcEvent event;
+    public Message(final User dest, final String message) {
+        channel = null;
+        user = dest;
+        this.message = message;
+    }
 
-  public Message(final String dest, final IrcEvent evt, final String value) {
-    destination = dest;
-    message = value;
-    event = evt;
-  }
+    public Message(final Message message, final String value) {
+        channel = message.getChannel();
+        user = message.getUser();
+        this.message = value;
+    }
 
-  public Message(final IrcUser sender, final IrcEvent event, final String value) {
-    this(sender.getNick(), event, value);
-  }
+    public Channel getChannel() {
+        return channel;
+    }
 
-  public IrcEvent getEvent() {
-    return event;
-  }
+    public User getUser() {
+        return user;
+    }
 
-  public String getDestination() {
-    return destination;
-  }
+    public String getMessage() {
+        return message;
+    }
 
-  public String getMessage() {
-    return message;
-  }
-
-  protected void setMessage(final String message) {
-    this.message = message;
-  }
-
-  public void send(final Javabot bot) {
-//    bot.postMessage(this);
-  }
-
-  @Override
-  public String toString() {
-    return message;
-  }
+    @Override
+    public String toString() {
+        return message;
+    }
 }

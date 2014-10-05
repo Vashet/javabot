@@ -2,6 +2,7 @@ package javabot.admin;
 
 import com.jayway.awaitility.Awaitility;
 import com.jayway.awaitility.Duration;
+import javabot.Messages;
 import javabot.dao.ApiDao;
 import javabot.dao.EventDao;
 import javabot.dao.JavadocClassDao;
@@ -9,6 +10,8 @@ import javabot.javadoc.JavadocApi;
 import javabot.model.ApiEvent;
 import javabot.model.EventType;
 import javabot.operations.BaseOperationTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -20,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 
 @Test
 public class JavadocTest extends BaseOperationTest {
+    private static final Logger LOG = LoggerFactory.getLogger(JavadocTest.class);
+
     @Inject
     private ApiDao apiDao;
 
@@ -29,13 +34,15 @@ public class JavadocTest extends BaseOperationTest {
     @Inject
     private EventDao eventDao;
 
+    @Inject
+    private Messages messages;
 
     @Test
     public void servlets() throws IOException {
         String apiName = "Servlet";
         dropApi(apiName);
-        addApi("Servlet", "http://tomcat.apache.org/tomcat-7.0-doc/servletapi/",
-               "http://search.maven.org/remotecontent?filepath=javax/servlet/javax.servlet-api/3.0.1/javax.servlet-api-3.0.1.jar");
+        addApi(apiName, "http://tomcat.apache.org/tomcat-7.0-doc/servletapi/",
+               "https://repo1.maven.org/maven2/javax/servlet/javax.servlet-api/3.0.1/javax.servlet-api-3.0.1.jar");
         checkServlets(apiName);
     }
 
@@ -45,7 +52,7 @@ public class JavadocTest extends BaseOperationTest {
         ApiEvent event = new ApiEvent(EventType.RELOAD, getTestUser().getNick(), apiDao.find(apiName).getId());
         eventDao.save(event);
         waitForEvent(event, "reloading " + apiName, new Duration(30, TimeUnit.MINUTES));
-        getJavabot().getMessages();
+        messages.get();
         checkServlets(apiName);
     }
 
@@ -62,8 +69,7 @@ public class JavadocTest extends BaseOperationTest {
     public void javaee() throws IOException {
         String apiName = "JavaEE7";
         dropApi(apiName);
-        addApi(apiName, "http://docs.oracle.com/javaee/7/api/",
-               "http://search.maven.org/remotecontent?filepath=javax/javaee-api/7.0/javaee-api-7.0.jar");
+        addApi(apiName, "http://docs.oracle.com/javaee/7/api/", "https://repo1.maven.org/maven2/javax/javaee-api/7.0/javaee-api-7.0.jar");
         scanForResponse("~javadoc Annotated", "javax.enterprise.inject.spi.Annotated");
         scanForResponse("~javadoc Annotated.getAnnotation(*)", "javax.enterprise.inject.spi.Annotated.getAnnotation");
         scanForResponse("~javadoc ContextService", "javax.enterprise.concurrent.ContextService");
@@ -92,7 +98,7 @@ public class JavadocTest extends BaseOperationTest {
                                           new File(System.getProperty("java.home"), "lib/rt.jar").toURI().toURL().toString());
             eventDao.save(event);
             waitForEvent(event, "adding JDK", new Duration(30, TimeUnit.MINUTES));
-            getJavabot().getMessages();
+            messages.get();
             api = apiDao.find("JDK");
         }
         Assert.assertEquals(javadocClassDao.getClass(api, "java.lang", "Integer").length, 1);
@@ -102,7 +108,8 @@ public class JavadocTest extends BaseOperationTest {
         ApiEvent event = new ApiEvent(getTestUser().getNick(), apiName, apiUrlString, downloadUrlString);
         eventDao.save(event);
         waitForEvent(event, "adding " + apiName, new Duration(30, TimeUnit.MINUTES));
-        drainMessages();
+        LOG.info("done waiting for event to finish");
+        messages.get();
     }
 
     private void dropApi(final String apiName) {
@@ -113,6 +120,6 @@ public class JavadocTest extends BaseOperationTest {
         Awaitility.await()
                   .atMost(60, TimeUnit.SECONDS)
                   .until(() -> apiDao.find(apiName) == null);
-        drainMessages();
+        messages.get();
     }
 }

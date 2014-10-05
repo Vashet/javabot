@@ -2,10 +2,10 @@ package javabot.operations;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
+import javabot.Message;
 import javabot.dao.FactoidDao;
 import javabot.model.Factoid;
 import org.pircbotx.Channel;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import javax.inject.Inject;
 
@@ -15,7 +15,7 @@ public class ForgetFactoidOperation extends StandardOperation {
     private FactoidDao factoidDao;
 
     @Override
-    public final boolean handleMessage(final MessageEvent event) {
+    public boolean handleMessage(final Message event) {
         final Channel channel = event.getChannel();
         String message = event.getMessage();
         boolean handled = false;
@@ -33,7 +33,7 @@ public class ForgetFactoidOperation extends StandardOperation {
         return handled;
     }
 
-    protected boolean forget(final MessageEvent event, final String key) {
+    protected boolean forget(final Message event, final String key) {
         final Factoid factoid = factoidDao.getFactoid(key);
         if (factoid != null) {
             if (!factoid.getLocked() || isAdminUser(event.getUser())) {

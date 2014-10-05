@@ -23,7 +23,7 @@ public class LogsOperation extends BotOperation {
     private Datastore ds;
 
     @Override
-    public final boolean handleMessage(final MessageEvent event) {
+    public boolean handleMessage(final Message event) {
         final String message = event.getMessage();
         if (message.toLowerCase().startsWith(KEYWORD_LOGS)) {
             final String nickname = message.substring(KEYWORD_LOGS.length()).trim();

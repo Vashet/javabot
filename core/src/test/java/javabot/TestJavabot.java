@@ -1,19 +1,13 @@
 package javabot;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.pircbotx.User;
-import org.pircbotx.hooks.events.MessageEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-
+@Singleton
 public class TestJavabot extends Javabot {
-    private List<MessageEvent> messages = new ArrayList<>();
-
-    public List<MessageEvent> getMessages() {
-        final List<MessageEvent> list = messages;
-        messages = new ArrayList<>();
-        return list;
-    }
+    @Inject
+    private Messages messages;
 
     @Override
     public void connect() {
@@ -33,7 +27,7 @@ public class TestJavabot extends Javabot {
     public void postMessage(final org.pircbotx.Channel channel, final User user, String message) {
         logMessage(channel, user, message);
         log.info(message);
-        messages.add(new MessageEvent<>(getIrcBot(), channel, user, message));
+        messages.add(new Message(channel, user, message));
     }
 
     @Override

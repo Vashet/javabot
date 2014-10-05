@@ -4,7 +4,6 @@ import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
 import javabot.Message;
 import org.pircbotx.Channel;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,7 @@ public class UnixCommandOperation extends BotOperation {
     }
 
     @Override
-    public boolean handleChannelMessage(final MessageEvent event) {
+    public boolean handleChannelMessage(final Message event) {
         final String message = event.getMessage();
         final Channel channel = event.getChannel();
         final String[] split = message.split(" ");

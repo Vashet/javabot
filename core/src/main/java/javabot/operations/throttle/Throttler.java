@@ -14,6 +14,7 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -31,7 +32,7 @@ public class Throttler extends BaseDao<ThrottleItem> {
     private NickServDao nickServDao;
 
     @Inject
-    private PircBotX ircBot;
+    private Provider<PircBotX> ircBot;
 
     protected Throttler() {
         super(ThrottleItem.class);
@@ -54,10 +55,10 @@ public class Throttler extends BaseDao<ThrottleItem> {
     }
 
     private void validateNickServAccount(final User user) {
-        if (ircBot.isConnected()) {
+        if (ircBot.get().isConnected()) {
             AtomicReference<NickServInfo> info = new AtomicReference<>(nickServDao.find(user.getNick()));
             if (info.get() == null) {
-                ircBot.sendIRC().message("NickServ", "info " + user.getNick());
+                ircBot.get().sendIRC().message("NickServ", "info " + user.getNick());
                 Sofia.logWaitingForNickserv(user.getNick());
                 try {
                     Awaitility.await()

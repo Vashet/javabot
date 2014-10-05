@@ -1,8 +1,8 @@
 package javabot.operations;
 
 import com.antwerkz.maven.SPI;
+import javabot.Message;
 import javabot.dao.ConfigDao;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import javax.inject.Inject;
 
@@ -13,13 +13,14 @@ public class QuitOperation extends BotOperation {
     private ConfigDao configDao;
 
     @Override
-    public final boolean handleMessage(final MessageEvent event) {
+    public boolean handleMessage(final Message event) {
         final String message = event.getMessage();
         if (message.toLowerCase().startsWith("quit ")) {
             if (message.substring("quit ".length()).equals(configDao.get().getPassword())) {
                 System.exit(0);
             }
+            return true;
         }
-        return true;
+        return false;
     }
 }

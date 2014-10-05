@@ -2,10 +2,10 @@ package javabot.commands;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
+import javabot.Message;
 import javabot.dao.ApiDao;
 import javabot.javadoc.JavadocApi;
 import org.pircbotx.Channel;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import javax.inject.Inject;
 
@@ -18,7 +18,7 @@ public class InfoApi extends AdminCommand {
     String name;
 
     @Override
-    public void execute(final MessageEvent event) {
+    public void execute(final Message event) {
         final Channel destination = event.getChannel();
         final JavadocApi api = dao.find(name);
         if (api != null) {

@@ -2,19 +2,20 @@ package javabot.commands;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
+import javabot.Message;
 import javabot.dao.ChannelDao;
 import javabot.model.Channel;
 import org.pircbotx.PircBotX;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 @SPI({AdminCommand.class})
 public class AddChannel extends AdminCommand {
     @Inject
     private ChannelDao dao;
     @Inject
-    private PircBotX ircBot;
+    private Provider<PircBotX> ircBot;
 
     @Param
     String name;
@@ -24,7 +25,7 @@ public class AddChannel extends AdminCommand {
     String password;
 
     @Override
-    public void execute(final MessageEvent event) {
+    public void execute(final Message event) {
         if (name.startsWith("#")) {
             Channel channel = dao.get(name);
             final Boolean isLogged = Boolean.valueOf(logged);
@@ -38,13 +39,13 @@ public class AddChannel extends AdminCommand {
             getBot().postMessage(event.getChannel(), event.getUser(), isLogged
                                                                       ? Sofia.adminJoiningLoggedChannel(name)
                                                                       : Sofia.adminJoiningChannel(name));
-            if(channel.getKey() == null) {
-                ircBot.sendIRC().joinChannel(channel.getName());
+            if (channel.getKey() == null) {
+                ircBot.get().sendIRC().joinChannel(channel.getName());
             } else {
-                ircBot.sendIRC().joinChannel(channel.getName(), channel.getKey());
+                ircBot.get().sendIRC().joinChannel(channel.getName(), channel.getKey());
             }
 
-            getBot().postMessage(ircBot.getUserChannelDao().getChannel(name), event.getUser(),
+            getBot().postMessage(ircBot.get().getUserChannelDao().getChannel(name), event.getUser(),
                                  Sofia.adminJoinedChannel(event.getUser().getNick()));
         } else {
             getBot().postMessage(event.getChannel(), event.getUser(), Sofia.adminBadChannelName());

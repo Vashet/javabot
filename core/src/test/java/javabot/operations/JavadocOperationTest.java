@@ -1,12 +1,11 @@
 package javabot.operations;
 
 import com.jayway.awaitility.Duration;
-import javabot.BaseTest;
+import javabot.Messages;
 import javabot.dao.ApiDao;
 import javabot.dao.EventDao;
 import javabot.javadoc.JavadocApi;
 import javabot.model.ApiEvent;
-import org.pircbotx.PircBotX;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -19,9 +18,9 @@ public class JavadocOperationTest extends BaseOperationTest {
     @Inject
     private ApiDao apiDao;
     @Inject
-    private PircBotX ircBot;
-    @Inject
     private EventDao eventDao;
+    @Inject
+    private Messages messages;
 
     @BeforeTest
     public void getBot() {
@@ -36,7 +35,7 @@ public class JavadocOperationTest extends BaseOperationTest {
             eventDao.save(event);
             waitForEvent(event, "adding JDK", new Duration(30, TimeUnit.MINUTES));
         }
-        getJavabot().getMessages();
+        messages.get();
 
     }
 
@@ -52,8 +51,7 @@ public class JavadocOperationTest extends BaseOperationTest {
         scanForResponse("~javadoc -jdk String.split(String)", "[JDK: java.lang.String.split(String)]");
         scanForResponse("~javadoc String.split(java.lang.String)", "[JDK: java.lang.String.split(String)]");
         scanForResponse("~javadoc String.join(*)", "[JDK: java.lang.String.join");
-        scanForResponse(String.format("%s %s", ircBot.getNick(), "javadoc String.split(*)"),
-                        "[JDK: java.lang.String.split(String)]");
+        scanForResponse(String.format("%s %s", getJavabot().getNick(), "javadoc String.split(*)"), "[JDK: java.lang.String.split(String)]");
     }
 
     public void nestedClasses() throws MalformedURLException {
@@ -70,7 +68,7 @@ public class JavadocOperationTest extends BaseOperationTest {
     public void doFinal() throws MalformedURLException {
         jdk();
         scanForResponse("~javadoc String.valueOf(*)",
-                        getTestUser() + ", too many results found.  Please see your private messages for results");
+                        getTestUser().getNick() + ", too many results found.  Please see your private messages for results");
     }
 
     public void fields() throws MalformedURLException {

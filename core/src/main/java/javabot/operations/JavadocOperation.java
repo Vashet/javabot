@@ -2,6 +2,7 @@ package javabot.operations;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
+import javabot.Message;
 import javabot.dao.ApiDao;
 import javabot.dao.JavadocClassDao;
 import javabot.javadoc.JavadocApi;
@@ -9,7 +10,6 @@ import javabot.javadoc.JavadocField;
 import net.swisstech.bitly.BitlyClient;
 import org.pircbotx.Channel;
 import org.pircbotx.User;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class JavadocOperation extends BotOperation {
     private static final int RESULT_LIMIT = 5;
 
     @Override
-    public final boolean handleMessage(final MessageEvent event) {
+    public boolean handleMessage(final Message event) {
         final String message = event.getMessage();
         boolean handled = false;
         if (message.toLowerCase().startsWith("javadoc")) {
@@ -58,7 +58,7 @@ public class JavadocOperation extends BotOperation {
         return handled;
     }
 
-    private boolean buildResponse(MessageEvent event, JavadocApi api, String key) {
+    private boolean buildResponse(Message event, JavadocApi api, String key) {
         final List<String> urls = handle(api, key);
         if (!urls.isEmpty()) {
             Channel channel = event.getChannel();
@@ -79,7 +79,7 @@ public class JavadocOperation extends BotOperation {
         return true;
     }
 
-    private StringBuilder buildResponse(MessageEvent event, List<String> urls,
+    private StringBuilder buildResponse(Message event, List<String> urls,
                                         StringBuilder urlMessage, Channel channel) {
         for (int index = 0; index < urls.size(); index++) {
             if ((urlMessage + urls.get(index)).length() > 400) {
@@ -164,7 +164,7 @@ public class JavadocOperation extends BotOperation {
         }
     }
 
-    private void displayApiList(final MessageEvent event) {
+    private void displayApiList(final Message event) {
         final StringBuilder builder = new StringBuilder();
         for (final JavadocApi api : apiDao.findAll()) {
             if (builder.length() != 0) {

@@ -1,43 +1,31 @@
 package javabot.operations;
 
 import com.antwerkz.maven.SPI;
-import javabot.IrcEvent;
+import com.antwerkz.sofia.Sofia;
 import javabot.Message;
 import javabot.dao.KarmaDao;
-import javabot.model.IrcUser;
 import javabot.model.Karma;
-import javabot.operations.throttle.Throttler;
 import org.pircbotx.Channel;
 import org.pircbotx.User;
-import org.pircbotx.hooks.events.MessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@SuppressWarnings("UnusedDeclaration")
 @SPI(BotOperation.class)
 public class KarmaOperation extends BotOperation {
-  @SuppressWarnings("UnusedDeclaration")
-  private static final Logger log = LoggerFactory.getLogger(KarmaOperation.class);
+    private static final Logger log = LoggerFactory.getLogger(KarmaOperation.class);
 
-  private static final Pattern optionPattern = Pattern.compile("\\s--\\p{Alpha}[\\p{Alnum}]*=");
+    private static final Pattern optionPattern = Pattern.compile("\\s--\\p{Alpha}[\\p{Alnum}]*=");
 
-  @Inject
-  private KarmaDao dao;
-
-  @Inject
-  private Throttler throttler;
+    @Inject
+    private KarmaDao dao;
 
     @Override
-    public final boolean handleMessage(final MessageEvent event) {
-        final List<Message> responses = new ArrayList<>();
-        responses.addAll(readKarma(event));
-        if (responses.isEmpty()) {
+    public boolean handleMessage(final Message event) {
+        boolean handled = readKarma(event);
+        if (!handled) {
             String message = event.getMessage();
             final User sender = event.getUser();
             final Channel channel = event.getChannel();
@@ -48,7 +36,7 @@ public class KarmaOperation extends BotOperation {
                 increment = false;
                 // check for no karma inc/dec, and ~-- and ~++ too
                 if (operationPointer < 1) {
-                    return responses;
+                    return false;
                 }
             }
 
@@ -64,10 +52,9 @@ public class KarmaOperation extends BotOperation {
              */
             if (!increment) {
                 final String potentialParam = message.substring(operationPointer - 1);
-                Matcher matcher = optionPattern.matcher(potentialParam);
-                if (matcher.find()) {
+                if (optionPattern.matcher(potentialParam).find()) {
                     // we PRESUMABLY have an option...
-                    return responses;
+                    return false;
                 }
             }
             final String nick;
@@ -78,16 +65,14 @@ public class KarmaOperation extends BotOperation {
                 throw e;
             }
             // got an empty nick; spaces only?
-            if (nick.isEmpty()) {
-                return responses;
+            if (!nick.isEmpty() && !channel.getName().startsWith("#")) {
+                getBot().postMessage(channel, event.getUser(), Sofia.privmsgChange());
+                handled = true;
             }
-            if (!channel.startsWith("#")) {
-                responses.add(new Message(channel, event, "Sorry, karma changes are not allowed in private messages."));
-            }
-            if (responses.isEmpty()) {
+            if (!handled) {
                 if (nick.equalsIgnoreCase(sender.getNick())) {
                     if (increment) {
-                        responses.add(new Message(channel, event, "You can't increment your own karma."));
+                        getBot().postMessage(channel, event.getUser(), Sofia.karmaOwnIncrement());
                     }
                     increment = false;
                 }
@@ -103,35 +88,10 @@ public class KarmaOperation extends BotOperation {
                 }
                 karma.setUserName(sender.getNick());
                 dao.save(karma);
-                responses.addAll(readKarma(new IrcEvent(event.getChannel(), event.getSender(), "karma " + nick)));
-            }
-        }
-        return responses;
-    }
-
-    public List<Message> readKarma(final MessageEvent event) {
-        final String message = event.getMessage();
-        final Channel channel = event.getChannel();
-        final User sender = event.getUser();
-        final List<Message> response = new ArrayList<>();
-        if (message.startsWith("karma ")) {
-            final String nick = message.substring("karma ".length()).toLowerCase();
-            final Karma karma = dao.find(nick);
-            if (karma != null) {
-                if (nick.equalsIgnoreCase(sender.getNick())) {
-                    getBot().postMessage(channel, event.getUser(),
-                                             sender + ", you have a karma level of " + karma.getValue()));
-                } else {
-                    getBot().postMessage(channel, event,
-                                             nick + " has a karma level of " + karma.getValue() + ", " + sender));
-                }
-            } else {
-                getBot().postMessage(channel, event, nick + " has no karma, " + sender));
+                return readKarma(new Message(event.getChannel(), event.getUser(), "karma " + nick));
             }
         }
         return true;
     }
-    return response;
-  }
 
 }

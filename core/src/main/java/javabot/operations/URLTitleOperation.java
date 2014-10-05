@@ -1,6 +1,7 @@
 package javabot.operations;
 
 import com.antwerkz.maven.SPI;
+import javabot.Message;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -12,7 +13,6 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import java.io.IOException;
 import java.net.URL;
@@ -20,7 +20,7 @@ import java.net.URL;
 @SPI(BotOperation.class)
 public class URLTitleOperation extends BotOperation {
     @Override
-    public boolean handleChannelMessage(final MessageEvent event) {
+    public boolean handleChannelMessage(final Message event) {
         final String message = event.getMessage();
         if (message.contains("http://") || message.contains("https://")) {
             for (String token : message.split(" ")) {
@@ -39,7 +39,7 @@ public class URLTitleOperation extends BotOperation {
         return false;
     }
 
-    private void findTitle(MessageEvent event, String url, String originalUrl, boolean loop) throws IOException {
+    private void findTitle(Message event, String url, String originalUrl, boolean loop) throws IOException {
         try {
             HttpParams params = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(params, 5 * 1000);

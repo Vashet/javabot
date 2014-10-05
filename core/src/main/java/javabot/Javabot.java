@@ -3,8 +3,8 @@ package javabot;
 import com.antwerkz.sofia.Sofia;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Singleton;
 import javabot.commands.AdminCommand;
-import javabot.dao.ChannelDao;
 import javabot.dao.ConfigDao;
 import javabot.dao.EventDao;
 import javabot.dao.LogsDao;
@@ -22,11 +22,11 @@ import javabot.operations.throttle.NickServViolationException;
 import javabot.operations.throttle.Throttler;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
-import org.pircbotx.hooks.events.MessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,6 +44,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+@Singleton
 public class Javabot {
     public static final Logger log = LoggerFactory.getLogger(Javabot.class);
 
@@ -66,10 +67,7 @@ public class Javabot {
     protected Injector injector;
 
     @Inject
-    private BotListener botListener;
-
-    @Inject
-    private PircBotX ircBot;
+    private Provider<PircBotX> ircBot;
 
     private Map<String, BotOperation> allOperations;
 
@@ -90,7 +88,6 @@ public class Javabot {
         setUpThreads();
         loadOperations();
         applyUpgradeScripts();
-        startStrings = new String[]{getNick(), "~"};
         connect();
     }
 
@@ -136,7 +133,7 @@ public class Javabot {
 
     public void connect() {
         try {
-            ircBot.startBot();
+            ircBot.get().startBot();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -151,28 +148,28 @@ public class Javabot {
 
     @SuppressWarnings({"unchecked"})
     protected final void loadOperations() {
-        final Config config = configDao.get();
-        allOperations = new TreeMap<>();
-        for (final BotOperation op : BotOperation.list()) {
-            injector.injectMembers(op);
-            op.setBot(this);
-            allOperations.put(op.getName(), op);
+        if (allOperations == null) {
+            final Config config = configDao.get();
+            allOperations = new TreeMap<>();
+            for (final BotOperation op : BotOperation.list()) {
+                injector.injectMembers(op);
+                allOperations.put(op.getName(), op);
+            }
+            try {
+                config.getOperations().forEach(this::enableOperation);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                throw new RuntimeException(e.getMessage(), e);
+            }
+            addDefaultOperations(ServiceLoader.load(AdminCommand.class));
+            addDefaultOperations(ServiceLoader.load(StandardOperation.class));
+            Collections.sort(standard, new BotOperationComparator());
         }
-        try {
-            config.getOperations().forEach(this::enableOperation);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
-        }
-        addDefaultOperations(ServiceLoader.load(AdminCommand.class));
-        addDefaultOperations(ServiceLoader.load(StandardOperation.class));
-        Collections.sort(standard, new BotOperationComparator());
     }
 
     private void addDefaultOperations(final ServiceLoader<? extends BotOperation> loader) {
         for (final BotOperation operation : loader) {
             injector.injectMembers(operation);
-            operation.setBot(this);
             standard.add(operation);
         }
     }
@@ -202,48 +199,44 @@ public class Javabot {
     }
 
     public String[] getStartStrings() {
+        if (startStrings == null) {
+            startStrings = new String[]{getNick(), "~"};
+        }
         return startStrings;
     }
 
-    public void processMessage(final MessageEvent event) {
-        try {
-            final User sender = event.getUser();
-            final String message = event.getMessage();
-            final org.pircbotx.Channel channel = event.getChannel();
-            logsDao.logMessage(Logs.Type.MESSAGE, sender.getNick(), channel.getName(), message);
-            boolean handled = false;
-            if (isValidSender(sender.getNick())) {
-                for (final String startString : startStrings) {
-                    if (message.startsWith(startString)) {
-                        try {
-                            if (throttler.isThrottled(event.getUser())) {
-                                event.getUser().send().message(Sofia.throttledUser());
-                            } else {
-                                String content = message.substring(startString.length()).trim();
-                                while (!content.isEmpty() && (content.charAt(0) == ':' || content.charAt(0) == ',')) {
-                                    content = content.substring(1).trim();
-                                }
-                                if (!content.isEmpty()) {
-                                    handled = getResponses(new MessageEvent<>(event.getBot(), event.getChannel(),
-                                                                              event.getUser(), content), event.getUser());
-                                }
+    public void processMessage(final Message message) {
+        final User sender = message.getUser();
+        final org.pircbotx.Channel channel = message.getChannel();
+        logsDao.logMessage(Logs.Type.MESSAGE, channel, sender, message.getMessage());
+        boolean handled = false;
+        if (isValidSender(sender.getNick())) {
+            for (final String startString : getStartStrings()) {
+                if (message.getMessage().startsWith(startString)) {
+                    try {
+                        if (throttler.isThrottled(message.getUser())) {
+                            message.getUser().send().message(Sofia.throttledUser());
+                        } else {
+                            String content = message.getMessage().substring(startString.length()).trim();
+                            while (!content.isEmpty() && (content.charAt(0) == ':' || content.charAt(0) == ',')) {
+                                content = content.substring(1).trim();
                             }
-                        } catch (NickServViolationException e) {
-                            event.getUser().send().message(e.getMessage());
+                            if (!content.isEmpty()) {
+                                handled = getResponses(new Message(message, content), message.getUser());
+                            }
                         }
+                    } catch (NickServViolationException e) {
+                        message.getUser().send().message(e.getMessage());
                     }
                 }
-                if (!handled) {
-                    getChannelResponses(event);
-                }
-            } else {
-                if (log.isInfoEnabled()) {
-                    log.info("ignoring " + sender);
-                }
             }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            if (!handled) {
+                getChannelResponses(message);
+            }
+        } else {
+            if (log.isInfoEnabled()) {
+                log.info("ignoring " + sender);
+            }
         }
     }
 
@@ -261,58 +254,59 @@ public class Javabot {
     }
 
     public void postAction(final org.pircbotx.Channel channel, String message) {
-        final String sender = ircBot.getNick();
-        if (!channel.getName().equals(sender)) {
-            logsDao.logMessage(Type.ACTION, sender, channel.getName(), message);
+        final User bot = ircBot.get().getUserBot();
+        if (!channel.getName().equals(bot.getNick())) {
+            logsDao.logMessage(Type.ACTION, channel, bot, message);
         }
         channel.send().action(message);
     }
 
     protected final void logMessage(final org.pircbotx.Channel channel, final User user, String message) {
-        final String sender = ircBot.getNick();
+        final String sender = ircBot.get().getNick();
         if (channel != null && !channel.getName().equals(sender)) {
-            logsDao.logMessage(Logs.Type.MESSAGE, user.getNick(), channel.getName(), message);
+            logsDao.logMessage(Logs.Type.MESSAGE, channel, user, message);
         }
     }
 
-    public boolean getResponses(final MessageEvent event, final User requester) {
-        final Iterator<BotOperation> iterator = getAllOperations().iterator();
+    public boolean getResponses(final Message message, final User requester) {
+        List<BotOperation> allOperations1 = getAllOperations();
+        final Iterator<BotOperation> iterator = allOperations1.iterator();
         boolean handled = false;
         while (iterator.hasNext() && !handled) {
-            handled = iterator.next().handleMessage(event);
+            BotOperation next = iterator.next();
+            handled = next.handleMessage(message);
+            if (handled) {
+                System.out.println("message = " + message);
+                System.out.println("next = " + next);
+            }
         }
 
         if (!handled) {
-            postMessage(event.getChannel(), requester, Sofia.unhandledMessage(requester.getNick()));
+            postMessage(message.getChannel(), requester, Sofia.unhandledMessage(requester.getNick()));
         }
         return handled;
     }
 
-    public boolean getChannelResponses(final MessageEvent event) {
+    public boolean getChannelResponses(final Message event) {
         final Iterator<BotOperation> iterator = getAllOperations().iterator();
         boolean handled = false;
-        if (throttler.isThrottled(event.getUser())) {
+        if (!throttler.isThrottled(event.getUser())) {
             while (iterator.hasNext() && !handled) {
                 handled = iterator.next().handleChannelMessage(event);
-                if (!handled) {
-                    try {
-                        event.getUser().send().message(Sofia.throttledUser());
-                    } catch (NickServViolationException e) {
-                        handled = true;
-                        event.getUser().send().message(e.getMessage());
-                    }
-                }
+            }
+        } else {
+            try {
+                postMessage(null, event.getUser(), Sofia.throttledUser());
+            } catch (NickServViolationException e) {
+                handled = true;
+                postMessage(null, event.getUser(), e.getMessage());
             }
         }
         return handled;
     }
 
-    public User findUser(final String name) {
-        return ircBot.getUserChannelDao().getUser(name);
-    }
-
     public boolean isOnCommonChannel(final User user) {
-        return !ircBot.getUserChannelDao().getChannels(user).isEmpty();
+        return !ircBot.get().getUserChannelDao().getChannels(user).isEmpty();
     }
 
     protected boolean isValidSender(final String sender) {
@@ -331,9 +325,5 @@ public class Javabot {
         }
         Javabot bot = injector.getInstance(Javabot.class);
         bot.start();
-    }
-
-    public PircBotX getIrcBot() {
-        return ircBot;
     }
 }

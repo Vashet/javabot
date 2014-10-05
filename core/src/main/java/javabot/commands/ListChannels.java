@@ -2,11 +2,11 @@ package javabot.commands;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
+import javabot.Message;
 import javabot.dao.ChannelDao;
 import javabot.dao.util.QueryParam;
 import javabot.model.Channel;
 import org.apache.commons.lang.StringUtils;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -20,7 +20,7 @@ public class ListChannels extends AdminCommand {
     private ChannelDao dao;
 
     @Override
-    public void execute(final MessageEvent event) {
+    public void execute(final Message event) {
         final List<Channel> channels = dao.find(new QueryParam(0, Integer.MAX_VALUE));
         getBot().postMessage(event.getChannel(), event.getUser(), Sofia.adminListChannelsPreamble(event.getUser().getNick()));
         final List<String> names = channels.stream()

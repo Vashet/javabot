@@ -2,8 +2,8 @@ package javabot.operations;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
+import javabot.Message;
 import javabot.commands.AdminCommand;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @SPI({AdminCommand.class})
 public class ListAdminCommands extends AdminCommand {
     @Override
-    public void execute(MessageEvent event) {
+    public void execute(Message event) {
         List<String> list = listCommands()
                                 .stream()
                                 .map(AdminCommand::getCommandName)

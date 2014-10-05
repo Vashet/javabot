@@ -2,10 +2,10 @@ package javabot.operations;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
+import javabot.Message;
 import javabot.dao.FactoidDao;
 import javabot.model.Factoid;
 import org.pircbotx.Channel;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;
@@ -22,7 +22,7 @@ public class InfoOperation extends BotOperation {
     private FactoidDao dao;
 
     @Override
-    public final boolean handleMessage(final MessageEvent event) {
+    public boolean handleMessage(final Message event) {
         final String message = event.getMessage().toLowerCase();
         final Channel channel = event.getChannel();
         if (message.startsWith("info ")) {

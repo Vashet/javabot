@@ -2,9 +2,9 @@ package javabot.commands;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
+import javabot.Message;
 import javabot.dao.FactoidDao;
 import javabot.model.Factoid;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import javax.inject.Inject;
 
@@ -22,7 +22,7 @@ public class LockFactoid extends AdminCommand {
     }
 
     @Override
-    public void execute(final MessageEvent event) {
+    public void execute(final Message event) {
         final String command = args.get(0);
         if ("lock".equals(command) || "unlock".equals(command)) {
             final Factoid factoid = dao.getFactoid(name);

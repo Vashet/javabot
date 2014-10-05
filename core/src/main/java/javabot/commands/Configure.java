@@ -2,10 +2,10 @@ package javabot.commands;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
+import javabot.Message;
 import javabot.dao.ConfigDao;
 import javabot.model.Config;
 import org.apache.commons.lang.StringUtils;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import javax.inject.Inject;
 import java.lang.reflect.Method;
@@ -20,7 +20,7 @@ public class Configure extends AdminCommand {
     String value;
 
     @Override
-    public void execute(final MessageEvent event) {
+    public void execute(final Message event) {
         final Config config = dao.get();
         if (StringUtils.isEmpty(property)) {
             getBot().postMessage(null, event.getUser(), config.toString());

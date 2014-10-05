@@ -1,7 +1,6 @@
 package javabot.model;
 
 import javabot.Javabot;
-import javabot.dao.EventDao;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;

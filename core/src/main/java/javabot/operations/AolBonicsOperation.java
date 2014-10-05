@@ -2,7 +2,7 @@ package javabot.operations;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
-import org.pircbotx.hooks.events.MessageEvent;
+import javabot.Message;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -32,7 +32,7 @@ public class AolBonicsOperation extends BotOperation {
     }
 
     @Override
-    public boolean handleChannelMessage(final MessageEvent event) {
+    public boolean handleChannelMessage(final Message event) {
         for (final String bad : event.getMessage().split(" ")) {
             if (phrases.contains(bad.toLowerCase().replaceAll("!|\\.|\\?|,", ""))) {
                 getBot().postMessage(event.getChannel(), event.getUser(), Sofia.botAolbonics(event.getUser().getNick()));

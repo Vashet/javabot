@@ -2,7 +2,7 @@ package javabot.operations;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
-import org.pircbotx.hooks.events.MessageEvent;
+import javabot.Message;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -17,7 +17,7 @@ import static java.time.LocalDateTime.now;
 @SPI(BotOperation.class)
 public class DaysToChristmasOperation extends BotOperation {
     @Override
-    public final boolean handleMessage(final MessageEvent event) {
+    public boolean handleMessage(final Message event) {
         if ("countdown to christmas".equals(event.getMessage().toLowerCase())) {
             LocalDateTime christmas = LocalDateTime.of(now().getYear(), Month.DECEMBER, 25, 0, 0, 0);
             LocalDateTime now = now();

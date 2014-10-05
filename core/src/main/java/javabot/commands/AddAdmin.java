@@ -2,9 +2,11 @@ package javabot.commands;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
+import com.google.inject.Provider;
+import javabot.Message;
 import javabot.dao.AdminDao;
+import org.pircbotx.PircBotX;
 import org.pircbotx.User;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import javax.inject.Inject;
 
@@ -12,14 +14,16 @@ import javax.inject.Inject;
 public class AddAdmin extends AdminCommand {
     @Inject
     private AdminDao dao;
+    @Inject
+    private Provider<PircBotX> ircBot;
     @Param
     String userName;
     @Param
     String hostName;
 
     @Override
-    public void execute(final MessageEvent event) {
-        final User user = getJavabot().findUser(userName);
+    public void execute(final Message event) {
+        final User user = findUser(userName);
         if (user == null) {
             getJavabot().postMessage(event.getChannel(), event.getUser(), Sofia.userNotFound(userName));
         } else {
@@ -31,4 +35,9 @@ public class AddAdmin extends AdminCommand {
             }
         }
     }
+
+    public User findUser(final String name) {
+        return ircBot.get().getUserChannelDao().getUser(name);
+    }
+
 }

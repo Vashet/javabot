@@ -20,7 +20,7 @@ public class WeatherOperation extends BotOperation {
     private WeatherDao weatherDao;
 
     @Override
-    public final boolean handleMessage(final MessageEvent event) {
+    public boolean handleMessage(final Message event) {
         final String message = event.getMessage();
         if (message.toLowerCase().startsWith("weather ")) {
             final String place = message.substring("weather ".length()).trim();

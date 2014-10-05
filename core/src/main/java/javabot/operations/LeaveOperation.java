@@ -2,24 +2,18 @@ package javabot.operations;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
+import javabot.Message;
 import org.pircbotx.Channel;
-import org.pircbotx.PircBotX;
 import org.pircbotx.User;
-import org.pircbotx.hooks.events.MessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
 
 @SPI(BotOperation.class)
 public class LeaveOperation extends BotOperation {
     private static final Logger log = LoggerFactory.getLogger(LeaveOperation.class);
 
-    @Inject
-    private PircBotX ircBot;
-
     @Override
-    public final boolean handleMessage(final MessageEvent event) {
+    public boolean handleMessage(final Message event) {
         final String message = event.getMessage();
         final Channel channel = event.getChannel();
         final User sender = event.getUser();

@@ -1,5 +1,6 @@
 package javabot.model;
 
+import com.google.inject.Provider;
 import javabot.Javabot;
 import javabot.dao.AdminDao;
 import javabot.dao.ApiDao;
@@ -33,7 +34,7 @@ public class ApiEvent extends AdminEvent {
 
     @Inject
     @Transient
-    private PircBotX ircBot;
+    private Provider<PircBotX> ircBot;
 
     @Inject
     @Transient
@@ -108,12 +109,12 @@ public class ApiEvent extends AdminEvent {
         this.downloadUrl = downloadUrl;
     }
 
-    public void update(Javabot bot) {
-        delete(bot);
+    public void update() {
+        delete();
         add();
     }
 
-    public void delete(Javabot bot) {
+    public void delete() {
         JavadocApi api = apiDao.find(apiId);
         if (api == null) {
             api = apiDao.find(name);
@@ -138,8 +139,8 @@ public class ApiEvent extends AdminEvent {
     }
 
     private void process(final JavadocApi api) {
-        final Admin admin = adminDao.getAdmin(ircBot.getUserChannelDao().getUser(getRequestedBy()));
-        final User user = ircBot.getUserChannelDao().getUser(admin.getIrcName());
+        final Admin admin = adminDao.getAdmin(ircBot.get().getUserChannelDao().getUser(getRequestedBy()));
+        final User user = ircBot.get().getUserChannelDao().getUser(admin.getIrcName());
         try {
             File file = downloadZip(api.getName() + ".jar", api.getDownloadUrl());
             parser.parse(api, file.getAbsolutePath(), new StringWriter() {
@@ -155,11 +156,11 @@ public class ApiEvent extends AdminEvent {
 
     private File downloadZip(final String fileName, final String zipURL) throws IOException {
         File file = new File("/tmp/" + fileName);
+        int read;
         if (!file.exists()) {
             try (InputStream inputStream = new URL(zipURL).openStream();
                  OutputStream fos = new FileOutputStream(file)) {
                 byte[] bytes = new byte[8192];
-                int read;
                 while ((read = inputStream.read(bytes)) != -1) {
                     fos.write(bytes, 0, read);
                 }

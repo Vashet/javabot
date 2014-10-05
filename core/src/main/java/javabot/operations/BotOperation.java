@@ -1,6 +1,8 @@
 package javabot.operations;
 
+import com.google.inject.Provider;
 import javabot.Javabot;
+import javabot.Message;
 import javabot.dao.AdminDao;
 import org.pircbotx.User;
 import org.pircbotx.hooks.events.MessageEvent;
@@ -31,18 +33,14 @@ public abstract class BotOperation {
         return bot;
     }
 
-    public void setBot(final Javabot bot) {
-        this.bot = bot;
-    }
-
     /**
      * @return true if the message has been handled
      */
-    public boolean handleMessage(final MessageEvent event) {
+    public boolean handleMessage(final Message event) {
         return false;
     }
 
-    public boolean handleChannelMessage(final MessageEvent event) {
+    public boolean handleChannelMessage(final Message event) {
         return false;
     }
 

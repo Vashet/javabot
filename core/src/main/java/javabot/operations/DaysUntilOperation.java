@@ -2,8 +2,8 @@ package javabot.operations;
 
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
+import javabot.Message;
 import org.pircbotx.User;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -13,7 +13,7 @@ import java.util.Date;
 @SPI(BotOperation.class)
 public class DaysUntilOperation extends BotOperation {
     @Override
-    public final boolean handleMessage(final MessageEvent event) {
+    public boolean handleMessage(final Message event) {
         String message = event.getMessage().toLowerCase();
         boolean handled = false;
         if (message.startsWith("days until ")) {
@@ -43,7 +43,7 @@ public class DaysUntilOperation extends BotOperation {
         return handled;
     }
 
-    private void calcTime(final MessageEvent event, final LocalDateTime d) {
+    private void calcTime(final Message event, final LocalDateTime d) {
         final Long days = Duration.between(d, LocalDateTime.now().withHour(0)).toDays();
         long l = d.toLocalDate().toEpochDay();
         getBot().postMessage(event.getChannel(), event.getUser(), Sofia.daysUntil(event.getUser().getNick(), days, new Date(l)));

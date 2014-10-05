@@ -64,25 +64,25 @@ public class BotListener extends ListenerAdapter {
     @Override
     public void onMessage(final MessageEvent event) {
         Javabot javabot = javabotProvider.get();
-        javabot.executors.execute(() -> javabot.processMessage(event));
+        javabot.executors.execute(() -> javabot.processMessage(new Message(event.getChannel(), event.getUser(), event.getMessage())));
     }
 
     @Override
     public void onJoin(final JoinEvent event) {
-        logsDao.logMessage(Logs.Type.JOIN, event.getUser().getNick(), event.getChannel().getName(),
+        logsDao.logMessage(Logs.Type.JOIN, event.getChannel(), event.getUser(),
                            ":" + event.getUser().getHostmask() + " joined the channel");
     }
 
     @Override
     public void onPart(final PartEvent event) {
-        logsDao.logMessage(Logs.Type.PART, event.getUser().getNick(), event.getChannel().getName(),
+        logsDao.logMessage(Logs.Type.PART, event.getChannel(), event.getUser(),
                            ":" + event.getUser() + " parted the channel");
         nickServDao.unregister(event.getUser());
     }
 
     @Override
     public void onQuit(final QuitEvent event) {
-        logsDao.logMessage(Logs.Type.QUIT, event.getUser().getNick(), null, "quit");
+        logsDao.logMessage(Logs.Type.QUIT, null, event.getUser(), "quit");
         nickServDao.unregister(event.getUser());
     }
 
@@ -138,8 +138,7 @@ public class BotListener extends ListenerAdapter {
                 javabot.logMessage(null, event.getUser(), event.getMessage());
                 try {
                     if (!throttler.isThrottled(event.getUser())) {
-                        javabot.getResponses(new MessageEvent<>(event.getBot(), null, event.getUser(), event.getMessage()),
-                                             event.getUser());
+                        javabot.getResponses(new Message(event.getUser(), event.getMessage()), event.getUser());
                     }
                 } catch (NickServViolationException e) {
                     event.getUser().send().message(e.getMessage());
@@ -150,12 +149,12 @@ public class BotListener extends ListenerAdapter {
 
     @Override
     public void onAction(final ActionEvent event) {
-        logsDao.logMessage(Logs.Type.ACTION, event.getUser().getNick(), event.getChannel().getName(), event.getMessage());
+        logsDao.logMessage(Logs.Type.ACTION, event.getChannel(), event.getUser(), event.getMessage());
     }
 
     @Override
     public void onKick(final KickEvent event) {
-        logsDao.logMessage(Logs.Type.KICK, event.getUser().getNick(), event.getChannel().getName(),
+        logsDao.logMessage(Logs.Type.KICK, event.getChannel(), event.getUser(),
                            String.format(" kicked %s (%s)", event.getRecipient().getNick(), event.getReason()));
     }
 

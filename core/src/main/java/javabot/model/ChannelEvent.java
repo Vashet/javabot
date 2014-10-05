@@ -1,13 +1,13 @@
 package javabot.model;
 
 import com.antwerkz.sofia.Sofia;
-import javabot.Javabot;
 import javabot.dao.ChannelDao;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Transient;
 import org.pircbotx.PircBotX;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 @Entity("events")
 public class ChannelEvent extends AdminEvent {
@@ -16,7 +16,7 @@ public class ChannelEvent extends AdminEvent {
     private ChannelDao channelDao;
     @Inject
     @Transient
-    private PircBotX ircBot;
+    private Provider<PircBotX> ircBot;
     private String channel;
     private String key;
     private Boolean logged;
@@ -65,9 +65,9 @@ public class ChannelEvent extends AdminEvent {
 
     protected void join(final Channel chan) {
         if (chan.getKey() == null) {
-            ircBot.sendIRC().joinChannel(chan.getName());
+            ircBot.get().sendIRC().joinChannel(chan.getName());
         } else {
-            ircBot.sendIRC().joinChannel(chan.getName(), chan.getKey());
+            ircBot.get().sendIRC().joinChannel(chan.getName(), chan.getKey());
         }
     }
 
@@ -76,7 +76,7 @@ public class ChannelEvent extends AdminEvent {
         Channel chan = channelDao.get(channel);
         if (chan != null) {
             channelDao.delete(chan.getId());
-            ircBot.getUserChannelDao().getChannel(channel).send().part(Sofia.channelDeleted(getRequestedBy()));
+            ircBot.get().getUserChannelDao().getChannel(channel).send().part(Sofia.channelDeleted(getRequestedBy()));
         }
     }
 
@@ -87,7 +87,7 @@ public class ChannelEvent extends AdminEvent {
             chan.setLogged(logged);
             chan.setKey(key);
             channelDao.save(chan);
-            ircBot.getUserChannelDao().getChannel(channel).send().part(Sofia.channelDeleted(getRequestedBy()));
+            ircBot.get().getUserChannelDao().getChannel(channel).send().part(Sofia.channelDeleted(getRequestedBy()));
             join(chan);
         }
     }
