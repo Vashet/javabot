@@ -21,7 +21,7 @@ import java.net.URL;
 public class URLTitleOperation extends BotOperation {
     @Override
     public boolean handleChannelMessage(final Message event) {
-        final String message = event.getMessage();
+        final String message = event.getValue();
         if (message.contains("http://") || message.contains("https://")) {
             for (String token : message.split(" ")) {
                 if (token.startsWith("http")) {
@@ -51,7 +51,7 @@ public class URLTitleOperation extends BotOperation {
             if (entity != null) {
                 try {
                     Document doc = Jsoup.parse(EntityUtils.toString(entity));
-                    getBot().postMessage(event.getChannel(), event.getUser(), originalUrl + ": " + doc.title());
+                    getBot().postMessage(event.getChannel(), event.getUser(), originalUrl + ": " + doc.title(), event.isTell());
                 } finally {
                     EntityUtils.consume(entity);
                 }

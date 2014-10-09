@@ -21,10 +21,11 @@ public class StatsOperation extends BotOperation {
     @Override
     public boolean handleMessage(final Message event) {
         numberOfMessages++;
-        final String message = event.getMessage();
+        final String message = event.getValue();
         if ("stats".equalsIgnoreCase(message)) {
             getBot().postMessage(event.getChannel(), event.getUser(),
-                                 Sofia.botStats(Duration.between(now(), startTime).toDays(), numberOfMessages, factoidDao.count()));
+                                 Sofia.botStats(Duration.between(now(), startTime).toDays(), numberOfMessages, factoidDao.count()),
+                                 event.isTell());
             return true;
         }
         return false;

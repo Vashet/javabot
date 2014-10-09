@@ -3,20 +3,23 @@ package javabot.operations;
 import com.antwerkz.sofia.Sofia;
 import javabot.BaseTest;
 import javabot.Message;
+import javabot.Messages;
 import org.pircbotx.User;
 import org.testng.Assert;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static java.lang.String.format;
+
 public abstract class BaseOperationTest extends BaseTest {
     protected void scanForResponse(final String message, final String target) {
-        final List<Message> list = sendMessage(message);
+        final Messages list = sendMessage(message);
         boolean found = false;
-        for (final Message response : list) {
-            found |= response.getMessage().contains(target);
+        for (final String response : list) {
+            found |= response.contains(target);
         }
-        Assert.assertTrue(found, String.format("Did not find \n'%s' in \n'%s'", target, list));
+        Assert.assertTrue(found, format("Did not find \n'%s' in \n'%s'", target, list));
     }
 
     protected void testMessage(final String message, final String... responses) {
@@ -27,41 +30,41 @@ public abstract class BaseOperationTest extends BaseTest {
         compareResults(sendMessage(user, message), responses);
     }
 
-    private void compareResults(final List<Message> list, final String[] responses) {
-        Assert.assertEquals(list.size(), responses.length, String.format("Should get expected response count back. "
-                                                                         + "\n** expected: \n%s"
-                                                                         + "\n** got: \n%s", Arrays.toString(responses), list));
+    private void compareResults(final Messages messages, final String[] responses) {
+        Assert.assertEquals(messages.size(), responses.length,
+                            format("Should get expected response count back. "
+                                   + "\n** expected: \n%s"
+                                   + "\n** got: \n%s", Arrays.toString(responses), messages));
         for (final String response : responses) {
-            Assert.assertEquals(list.remove(0).getMessage(), response);
+            Assert.assertEquals(messages.remove(0), response);
         }
-        Assert.assertTrue(list.isEmpty(), "All responses should be matched.");
+        Assert.assertTrue(messages.isEmpty(), "All responses should be matched.");
     }
 
-    protected List<Message> sendMessage(final String message) {
+    protected Messages sendMessage(final String message) {
         return sendMessage(getTestUser(), message);
     }
 
-    protected List<Message> sendMessage(final User testUser, final String message) {
+    protected Messages sendMessage(final User testUser, final String message) {
         getJavabot().processMessage(new Message(getJavabotChannel(), testUser, message));
         return getMessages();
     }
 
     protected void testMessageList(final String message, final List<String> responses) {
-        final List<Message> list = sendMessage(message);
         boolean found = false;
-        for (final Message response : list) {
-            found |= responses.contains(response.getMessage());
+        for (final String response : sendMessage(message)) {
+            found |= responses.contains(response);
         }
-        Assert.assertTrue(found, String.format("Should get one response from the list of possibilities"
-                                               + "\n** expected: \n%s"
-                                               + "\n** got: \n%s", responses, list));
+        Assert.assertTrue(found, format("Should get one response from the list of possibilities"
+                                        + "\n** expected: \n%s"
+                                        + "\n** got: \n%s", responses, sendMessage(message)));
     }
 
     protected String getFoundMessage(final String factoid, final String value) {
-        return String.format("%s, %s is %s", getTestUser(), factoid, value);
+        return format("%s, %s is %s", getTestUser(), factoid, value);
     }
 
     protected void forgetFactoid(final String name) {
-        testMessage(String.format("~forget %s", name), Sofia.factoidForgotten(name, getTestUser().getNick()));
+        testMessage(format("~forget %s", name), Sofia.factoidForgotten(name, getTestUser().getNick()));
     }
 }

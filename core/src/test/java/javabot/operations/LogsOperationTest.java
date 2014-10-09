@@ -1,6 +1,7 @@
 package javabot.operations;
 
 import javabot.Message;
+import javabot.Messages;
 import javabot.model.Logs;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
@@ -11,7 +12,6 @@ import org.testng.annotations.Test;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import java.util.List;
 import java.util.UUID;
 
 public class LogsOperationTest extends BaseOperationTest {
@@ -28,21 +28,21 @@ public class LogsOperationTest extends BaseOperationTest {
         // Add a known and unique message to the logs so we can validate that we are testing against new data
         String uuid = UUID.randomUUID().toString();
         sendMessage(uuid);
-        List<Message> list = sendMessage("~logs");
+        Messages list = sendMessage("~logs");
         Assert.assertEquals(list.isEmpty(), false);
         int listSize = list.size();
-        Assert.assertTrue(list.get(listSize - 2).getMessage().contains(uuid));
-        Assert.assertTrue(list.get(listSize - 1).getMessage().contains("~logs"));
+        Assert.assertTrue(list.get(listSize - 2).contains(uuid));
+        Assert.assertTrue(list.get(listSize - 1).contains("~logs"));
     }
 
     @Test
     public void testNickSpecificLogsWhenNoLogsForNick() throws Exception {
         // We generate unique user names so that existing data in the DB doesn't interfere with this unit test
         String uuid = UUID.randomUUID().toString();
-        List<Message> list = sendMessage("~logs " + uuid);
+        Messages list = sendMessage("~logs " + uuid);
         int listSize = list.size();
         Assert.assertEquals(listSize, 1);
-        String msg = list.get(listSize - 1).getMessage();
+        String msg = list.get(listSize - 1);
         Assert.assertEquals(msg.contains("No logs found for nick: " + uuid), true);
     }
 
@@ -53,10 +53,10 @@ public class LogsOperationTest extends BaseOperationTest {
 
         };
         getJavabot().processMessage(new Message(getJavabotChannel(), user, "Hello I'm " + uuid));
-        List<Message> list = sendMessage("~logs " + uuid);
+        Messages list = sendMessage("~logs " + uuid);
         int listSize = list.size();
         Assert.assertEquals(listSize, 1);
-        Assert.assertEquals(list.get(listSize - 1).getMessage().contains(uuid), true);
+        Assert.assertEquals(list.get(listSize - 1).contains(uuid), true);
     }
 
     private class TestUser extends User {

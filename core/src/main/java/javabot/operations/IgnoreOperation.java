@@ -8,11 +8,11 @@ import javabot.Message;
 public class IgnoreOperation extends BotOperation {
     @Override
     public boolean handleMessage(final Message event) {
-        final String message = event.getMessage();
+        final String message = event.getValue();
         if (message.startsWith("ignore ")) {
             final String[] parts = message.split(" ");
             getBot().addIgnore(parts[1]);
-            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.botIgnoring(parts[1]));
+            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.botIgnoring(parts[1]), event.isTell());
             return true;
         }
         return false;

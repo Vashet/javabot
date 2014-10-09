@@ -27,15 +27,15 @@ public class LockFactoid extends AdminCommand {
         if ("lock".equals(command) || "unlock".equals(command)) {
             final Factoid factoid = dao.getFactoid(name);
             if (factoid == null) {
-                getBot().postMessage(event.getChannel(), event.getUser(), Sofia.factoidUnknown(name));
+                getBot().postMessage(event.getChannel(), event.getUser(), Sofia.factoidUnknown(name), event.isTell());
             } else if ("lock".equals(command)) {
                 factoid.setLocked(true);
                 dao.save(factoid);
-                getBot().postMessage(event.getChannel(), event.getUser(), name + " locked.");
+                getBot().postMessage(event.getChannel(), event.getUser(), name + " locked.", event.isTell());
             } else if ("unlock".equals(command)) {
                 factoid.setLocked(false);
                 dao.save(factoid);
-                getBot().postMessage(event.getChannel(), event.getUser(), name + " unlocked.");
+                getBot().postMessage(event.getChannel(), event.getUser(), name + " unlocked.", event.isTell());
             }
         }
     }

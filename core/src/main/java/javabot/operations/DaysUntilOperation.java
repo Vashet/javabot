@@ -14,7 +14,7 @@ import java.util.Date;
 public class DaysUntilOperation extends BotOperation {
     @Override
     public boolean handleMessage(final Message event) {
-        String message = event.getMessage().toLowerCase();
+        String message = event.getValue().toLowerCase();
         boolean handled = false;
         if (message.startsWith("days until ")) {
             final User sender = event.getUser();
@@ -36,7 +36,7 @@ public class DaysUntilOperation extends BotOperation {
                 i++;
             }
             if (d == null) {
-                getBot().postMessage(event.getChannel(), event.getUser(), Sofia.invalidDateFormat(sender));
+                getBot().postMessage(event.getChannel(), event.getUser(), Sofia.invalidDateFormat(sender), event.isTell());
                 handled = true;
             }
         }
@@ -46,6 +46,7 @@ public class DaysUntilOperation extends BotOperation {
     private void calcTime(final Message event, final LocalDateTime d) {
         final Long days = Duration.between(d, LocalDateTime.now().withHour(0)).toDays();
         long l = d.toLocalDate().toEpochDay();
-        getBot().postMessage(event.getChannel(), event.getUser(), Sofia.daysUntil(event.getUser().getNick(), days, new Date(l)));
+        getBot().postMessage(event.getChannel(), event.getUser(), Sofia.daysUntil(event.getUser().getNick(), days, new Date(l)),
+                             event.isTell());
     }
 }

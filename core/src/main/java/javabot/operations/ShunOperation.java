@@ -20,13 +20,13 @@ public class ShunOperation extends BotOperation {
     private ShunDao shunDao;
 
     public boolean handleMessage(final Message event) {
-        final String message = event.getMessage();
+        final String message = event.getValue();
         if (message.startsWith("shun ")) {
             final String[] parts = message.substring(5).split(" ");
             if (parts.length == 0) {
-                getBot().postMessage(event.getChannel(), event.getUser(), Sofia.shunUsage());
+                getBot().postMessage(event.getChannel(), event.getUser(), Sofia.shunUsage(), event.isTell());
             } else {
-                getBot().postMessage(event.getChannel(), event.getUser(), getShunnedMessage(parts));
+                getBot().postMessage(event.getChannel(), event.getUser(), getShunnedMessage(parts), event.isTell());
             }
             return true;
         }

@@ -29,7 +29,7 @@ import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BotListener extends ListenerAdapter {
+public class BotListener extends ListenerAdapter<PircBotX> {
     private static final Logger LOG = LoggerFactory.getLogger(BotListener.class);
 
     @Inject

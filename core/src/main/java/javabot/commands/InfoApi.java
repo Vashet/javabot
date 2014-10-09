@@ -22,9 +22,9 @@ public class InfoApi extends AdminCommand {
         final Channel destination = event.getChannel();
         final JavadocApi api = dao.find(name);
         if (api != null) {
-            getBot().postMessage(destination, event.getUser(), Sofia.apiLocation(api.getName(), api.getBaseUrl()));
+            getBot().postMessage(destination, event.getUser(), Sofia.apiLocation(api.getName(), api.getBaseUrl()), event.isTell());
         } else {
-            getBot().postMessage(destination, event.getUser(), Sofia.unknownApi(name, event.getUser().getNick()));
+            getBot().postMessage(destination, event.getUser(), Sofia.unknownApi(name, event.getUser().getNick()), event.isTell());
         }
     }
 }

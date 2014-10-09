@@ -19,15 +19,16 @@ public class LiteralOperation extends BotOperation {
      */
     @Override
     public boolean handleMessage(final Message event) {
-        final String message = event.getMessage().toLowerCase();
+        final String message = event.getValue().toLowerCase();
         final Channel channel = event.getChannel();
         if (message.startsWith("literal ")) {
             final String key = message.substring("literal ".length());
             final Factoid factoid = dao.getFactoid(key);
             if (factoid != null) {
-                getBot().postMessage(channel, event.getUser(), factoid.getValue());
+                getBot().postMessage(channel, event.getUser(), factoid.getValue(), event.isTell());
             } else {
-                getBot().postMessage(channel, event.getUser(), Sofia.factoidUnknown(key));
+                getBot().postMessage(channel, event.getOriginalUser(), Sofia.factoidUnknown(key),
+                                     event.isTell() && event.getSender() == null);
             }
         }
         return false;

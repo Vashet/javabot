@@ -35,9 +35,10 @@ public class JavabotModule extends AbstractModule {
     private Morphia morphia;
 
     private Datastore datastore;
-    private Provider<ConfigDao> configDaoProvider;
-    private Provider<ChannelDao> channelDaoProvider;
     private Provider<BotListener> botListenerProvider;
+
+    protected Provider<ChannelDao> channelDaoProvider;
+    protected Provider<ConfigDao> configDaoProvider;
 
     @Override
     protected void configure() {
@@ -100,19 +101,18 @@ public class JavabotModule extends AbstractModule {
 
     @Provides
     @Singleton
-    @SuppressWarnings("unchecked")
     protected PircBotX createIrcBot() {
         Config config = configDaoProvider.get().get();
         String nick = config.getNick();
-        Builder builder = new Builder()
-                              .setName(nick)
-                              .setLogin(nick)
-                              .setAutoNickChange(false)
-                              .setCapEnabled(true)
-                              .addListener(getBotListener())
-                              .setServerHostname(config.getServer())
-                              .setServerPort(config.getPort())
-                              .addCapHandler(new SASLCapHandler(nick, config.getPassword()));
+        Builder<PircBotX> builder = new Builder<>()
+                                        .setName(nick)
+                                        .setLogin(nick)
+                                        .setAutoNickChange(false)
+                                        .setCapEnabled(true)
+                                        .addListener(getBotListener())
+                                        .setServerHostname(config.getServer())
+                                        .setServerPort(config.getPort())
+                                        .addCapHandler(new SASLCapHandler(nick, config.getPassword()));
         for (Channel channel : channelDaoProvider.get().getChannels()) {
             if (channel.getKey() == null) {
                 builder.addAutoJoinChannel(channel.getName());

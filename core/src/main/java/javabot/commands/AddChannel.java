@@ -36,9 +36,9 @@ public class AddChannel extends AdminCommand {
                 dao.save(channel);
             }
 
-            getBot().postMessage(event.getChannel(), event.getUser(), isLogged
-                                                                      ? Sofia.adminJoiningLoggedChannel(name)
-                                                                      : Sofia.adminJoiningChannel(name));
+            getBot().postMessage(event.getChannel(), event.getUser(),
+                                 isLogged ? Sofia.adminJoiningLoggedChannel(name) : Sofia.adminJoiningChannel(name),
+                                 event.isTell());
             if (channel.getKey() == null) {
                 ircBot.get().sendIRC().joinChannel(channel.getName());
             } else {
@@ -46,9 +46,9 @@ public class AddChannel extends AdminCommand {
             }
 
             getBot().postMessage(ircBot.get().getUserChannelDao().getChannel(name), event.getUser(),
-                                 Sofia.adminJoinedChannel(event.getUser().getNick()));
+                                 Sofia.adminJoinedChannel(event.getUser().getNick()), event.isTell());
         } else {
-            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.adminBadChannelName());
+            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.adminBadChannelName(), event.isTell());
         }
     }
 }

@@ -31,7 +31,7 @@ public class JavadocOperation extends BotOperation {
 
     @Override
     public boolean handleMessage(final Message event) {
-        final String message = event.getMessage();
+        final String message = event.getValue();
         boolean handled = false;
         if (message.toLowerCase().startsWith("javadoc")) {
             String key = message.substring("javadoc".length()).trim();
@@ -67,13 +67,13 @@ public class JavadocOperation extends BotOperation {
             String nick = user.getNick();
             StringBuilder urlMessage = new StringBuilder(nick + ": ");
             if (urls.size() > RESULT_LIMIT) {
-                getBot().postMessage(event.getChannel(), user, Sofia.tooManyResults(nick));
+                getBot().postMessage(event.getChannel(), user, Sofia.tooManyResults(nick), event.isTell());
                 channel = null;
             }
             urlMessage = buildResponse(event, urls, urlMessage, channel);
-            getBot().postMessage(channel, user, urlMessage.toString());
+            getBot().postMessage(channel, user, urlMessage.toString(), event.isTell());
         } else {
-            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.noDocumentation(key));
+            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.noDocumentation(key), event.isTell());
         }
 
         return true;
@@ -83,7 +83,7 @@ public class JavadocOperation extends BotOperation {
                                         StringBuilder urlMessage, Channel channel) {
         for (int index = 0; index < urls.size(); index++) {
             if ((urlMessage + urls.get(index)).length() > 400) {
-                getBot().postMessage(channel, event.getUser(), urlMessage.toString());
+                getBot().postMessage(channel, event.getUser(), urlMessage.toString(), event.isTell());
                 urlMessage = new StringBuilder();
             }
             urlMessage
@@ -172,6 +172,7 @@ public class JavadocOperation extends BotOperation {
             }
             builder.append(api.getName());
         }
-        getBot().postMessage(event.getChannel(), event.getUser(), Sofia.javadocApiList(event.getUser().getNick(), builder));
+        getBot().postMessage(event.getChannel(), event.getUser(), Sofia.javadocApiList(event.getUser().getNick(), builder),
+                             event.isTell());
     }
 }

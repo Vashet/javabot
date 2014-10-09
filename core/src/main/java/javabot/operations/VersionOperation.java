@@ -14,9 +14,9 @@ import java.io.FileNotFoundException;
 public class VersionOperation extends StandardOperation {
     @Override
     public boolean handleMessage(final Message event) {
-        final String message = event.getMessage();
+        final String message = event.getValue();
         if ("version".equalsIgnoreCase(message)) {
-            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.botVersion(loadVersion()));
+            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.botVersion(loadVersion()), event.isTell());
             return true;
         }
         return false;

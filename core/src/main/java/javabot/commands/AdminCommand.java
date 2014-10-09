@@ -44,7 +44,7 @@ public abstract class AdminCommand extends BotOperation {
     @Override
     public final boolean handleMessage(final Message event) {
         boolean handled = false;
-        String message = event.getMessage();
+        String message = event.getValue();
         if (message.toLowerCase().startsWith("admin ")) {
             if (isAdminUser(event.getUser())) {
                 message = message.substring(6);
@@ -56,11 +56,11 @@ public abstract class AdminCommand extends BotOperation {
                         execute(event);
                     } catch (ParseException e) {
                         log.error(e.getMessage(), e);
-                        getBot().postMessage(null, event.getUser(), Sofia.adminParseFailure(e.getMessage()));
+                        getBot().postMessage(null, event.getUser(), Sofia.adminParseFailure(e.getMessage()), event.isTell());
                     }
                 }
             } else {
-                getBot().postMessage(event.getChannel(), event.getUser(), Sofia.notAdmin(event.getUser().getNick()));
+                getBot().postMessage(event.getChannel(), event.getUser(), Sofia.notAdmin(event.getUser().getNick()), event.isTell());
                 handled = true;
             }
         }

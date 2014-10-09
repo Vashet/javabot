@@ -44,6 +44,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.String.format;
+
 @Singleton
 public class Javabot {
     public static final Logger log = LoggerFactory.getLogger(Javabot.class);
@@ -208,16 +210,16 @@ public class Javabot {
     public void processMessage(final Message message) {
         final User sender = message.getUser();
         final org.pircbotx.Channel channel = message.getChannel();
-        logsDao.logMessage(Logs.Type.MESSAGE, channel, sender, message.getMessage());
+        logsDao.logMessage(Logs.Type.MESSAGE, channel, sender, message.getValue());
         boolean handled = false;
         if (isValidSender(sender.getNick())) {
             for (final String startString : getStartStrings()) {
-                if (message.getMessage().startsWith(startString)) {
+                if (message.getValue().startsWith(startString)) {
                     try {
                         if (throttler.isThrottled(message.getUser())) {
-                            message.getUser().send().message(Sofia.throttledUser());
+                            postMessage(null, message.getUser(), Sofia.throttledUser(), false);
                         } else {
-                            String content = message.getMessage().substring(startString.length()).trim();
+                            String content = message.getValue().substring(startString.length()).trim();
                             while (!content.isEmpty() && (content.charAt(0) == ':' || content.charAt(0) == ',')) {
                                 content = content.substring(1).trim();
                             }
@@ -226,7 +228,7 @@ public class Javabot {
                             }
                         }
                     } catch (NickServViolationException e) {
-                        message.getUser().send().message(e.getMessage());
+                        postMessage(null, message.getUser(), e.getMessage(), false);
                     }
                 }
             }
@@ -244,10 +246,11 @@ public class Javabot {
         ignores.add(sender);
     }
 
-    public void postMessage(final org.pircbotx.Channel channel, final User user, String message) {
+    public void postMessage(final org.pircbotx.Channel channel, final User user, String message, final boolean tell) {
         logMessage(channel, user, message);
         if (channel != null) {
-            channel.send().message(message);
+            String value = tell && !message.contains(user.getNick()) ? format("%s, %s", user.getNick(), message) : message;
+            channel.send().message(value);
         } else if (user != null) {
             user.send().message(message);
         }
@@ -269,22 +272,16 @@ public class Javabot {
     }
 
     public boolean getResponses(final Message message, final User requester) {
-        List<BotOperation> allOperations1 = getAllOperations();
-        final Iterator<BotOperation> iterator = allOperations1.iterator();
+        final Iterator<BotOperation> iterator = getAllOperations().iterator();
         boolean handled = false;
         while (iterator.hasNext() && !handled) {
-            BotOperation next = iterator.next();
-            handled = next.handleMessage(message);
-            if (handled) {
-                System.out.println("message = " + message);
-                System.out.println("next = " + next);
-            }
+            handled = iterator.next().handleMessage(message);
         }
 
         if (!handled) {
-            postMessage(message.getChannel(), requester, Sofia.unhandledMessage(requester.getNick()));
+            postMessage(message.getChannel(), requester, Sofia.unhandledMessage(requester.getNick()), false);
         }
-        return handled;
+        return true;
     }
 
     public boolean getChannelResponses(final Message event) {
@@ -296,10 +293,10 @@ public class Javabot {
             }
         } else {
             try {
-                postMessage(null, event.getUser(), Sofia.throttledUser());
+                postMessage(null, event.getUser(), Sofia.throttledUser(), false);
             } catch (NickServViolationException e) {
                 handled = true;
-                postMessage(null, event.getUser(), e.getMessage());
+                postMessage(null, event.getUser(), e.getMessage(), false);
             }
         }
         return handled;

@@ -19,7 +19,7 @@ public class RegisterNickOperation extends BotOperation {
 
     @Override
     public boolean handleMessage(Message event) {
-        final String message = event.getMessage();
+        final String message = event.getValue();
         if (message.startsWith("register ")) {
             String[] split = message.split(" ");
             if (split.length > 1) {
@@ -29,7 +29,7 @@ public class RegisterNickOperation extends BotOperation {
                 Config config = configDao.get();
                 String eventMessage = Sofia.registerNick(config.getUrl(), registration.getUrl(), twitterName);
 
-                getBot().postMessage(null, event.getUser(), eventMessage);
+                getBot().postMessage(null, event.getUser(), eventMessage, event.isTell());
                 return true;
             }
         }

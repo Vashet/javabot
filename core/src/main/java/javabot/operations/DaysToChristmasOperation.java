@@ -18,7 +18,7 @@ import static java.time.LocalDateTime.now;
 public class DaysToChristmasOperation extends BotOperation {
     @Override
     public boolean handleMessage(final Message event) {
-        if ("countdown to christmas".equals(event.getMessage().toLowerCase())) {
+        if ("countdown to christmas".equals(event.getValue().toLowerCase())) {
             LocalDateTime christmas = LocalDateTime.of(now().getYear(), Month.DECEMBER, 25, 0, 0, 0);
             LocalDateTime now = now();
             Duration duration = Duration.between(now, christmas);
@@ -28,7 +28,8 @@ public class DaysToChristmasOperation extends BotOperation {
             Instant instant = christmas.atZone(ZoneId.systemDefault()).toInstant();
 
             getBot().postMessage(event.getChannel(), event.getUser(),
-                                 Sofia.daysUntil(event.getUser().getNick(), duration.toDays(), Date.from(instant)));
+                                 Sofia.daysUntil(event.getUser().getNick(), duration.toDays(), Date.from(instant)),
+                                 event.isTell());
             return true;
         }
         return false;

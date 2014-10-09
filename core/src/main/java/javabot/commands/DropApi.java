@@ -23,13 +23,13 @@ public class DropApi extends AdminCommand {
         if (api != null) {
             drop(event, channel, api);
         } else {
-            getBot().postMessage(channel, event.getUser(), Sofia.unknownApi(name, event.getUser().getNick()));
+            getBot().postMessage(channel, event.getUser(), Sofia.unknownApi(name, event.getUser().getNick()), event.isTell());
         }
     }
 
     private void drop(final Message event, final Channel channel, final JavadocApi api) {
-        getBot().postMessage(channel, event.getUser(), Sofia.adminRemovingOldJavadoc(api.getName()));
+        getBot().postMessage(channel, event.getUser(), Sofia.adminRemovingOldJavadoc(api.getName()), event.isTell());
         dao.delete(api);
-        getBot().postMessage(channel, event.getUser(), Sofia.adminDoneRemovingOldJavadoc(api.getName()));
+        getBot().postMessage(channel, event.getUser(), Sofia.adminDoneRemovingOldJavadoc(api.getName()), event.isTell());
     }
 }

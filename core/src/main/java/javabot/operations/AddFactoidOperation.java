@@ -26,12 +26,12 @@ public class AddFactoidOperation extends StandardOperation {
 
     @Override
     public boolean handleMessage(final Message event) {
-        String message = event.getMessage();
+        String message = event.getValue();
         final Channel channel = event.getChannel();
         boolean handled = false;
         if (message.startsWith("no ") || message.startsWith("no, ")) {
             if (!channel.getName().startsWith("#") && !isAdminUser(event.getUser())) {
-                getBot().postMessage(channel, event.getUser(), Sofia.privmsgChange());
+                getBot().postMessage(channel, event.getUser(), Sofia.privmsgChange(), event.isTell());
                 handled = true;
             } else {
                 message = message.substring(2);
@@ -54,7 +54,7 @@ public class AddFactoidOperation extends StandardOperation {
         if (is != -1) {
             final Channel channel = event.getChannel();
             if (!channel.getName().startsWith("#") && !isAdminUser(event.getUser())) {
-                getBot().postMessage(channel, event.getUser(), Sofia.privmsgChange());
+                getBot().postMessage(channel, event.getUser(), Sofia.privmsgChange(), event.isTell());
             } else {
                 String key = message.substring(0, is);
                 key = key.replaceAll("^\\s+", "");
@@ -67,7 +67,8 @@ public class AddFactoidOperation extends StandardOperation {
                         } else {
                             logDao.logMessage(Type.MESSAGE, event.getChannel(), event.getUser(),
                                               Sofia.changingLockedFactoid(event.getUser(), key));
-                            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.factoidLocked(event.getUser()));
+                            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.factoidLocked(event.getUser()),
+                                                 event.isTell());
                             handled = true;
                         }
                     } else {
@@ -83,7 +84,7 @@ public class AddFactoidOperation extends StandardOperation {
         boolean handled = false;
         if (message.toLowerCase().contains(" is ")) {
             if (!event.getChannel().getName().startsWith("#") && !isAdminUser(event.getUser())) {
-                getBot().postMessage(event.getChannel(), event.getUser(), Sofia.privmsgChange());
+                getBot().postMessage(event.getChannel(), event.getUser(), Sofia.privmsgChange(), event.isTell());
                 handled = true;
             } else {
                 String key = message.substring(0, message.indexOf(" is "));
@@ -97,20 +98,21 @@ public class AddFactoidOperation extends StandardOperation {
                     value = message.substring(index + 4, message.length());
                 }
                 if (key.trim().isEmpty()) {
-                    getBot().postMessage(event.getChannel(), event.getUser(), Sofia.factoidInvalidName());
+                    getBot().postMessage(event.getChannel(), event.getUser(), Sofia.factoidInvalidName(), event.isTell());
                     handled = true;
                 } else if (value == null || value.trim().isEmpty()) {
-                    getBot().postMessage(event.getChannel(), event.getUser(), Sofia.factoidInvalidValue());
+                    getBot().postMessage(event.getChannel(), event.getUser(), Sofia.factoidInvalidValue(), event.isTell());
                     handled = true;
                 } else if (factoidDao.hasFactoid(key)) {
-                    getBot().postMessage(event.getChannel(), event.getUser(), Sofia.factoidExists(key, event.getUser().getNick()));
+                    getBot().postMessage(event.getChannel(), event.getUser(), Sofia.factoidExists(key, event.getUser().getNick()),
+                                         event.isTell());
                     handled = true;
                 } else {
                     if (value.startsWith("<see>")) {
                         value = value.toLowerCase();
                     }
                     factoidDao.addFactoid(event.getUser().getNick(), key, value);
-                    getBot().postMessage(event.getChannel(), event.getUser(), Sofia.ok(event.getUser().getNick()));
+                    getBot().postMessage(event.getChannel(), event.getUser(), Sofia.ok(event.getUser().getNick()), event.isTell());
                     handled = true;
                 }
             }
@@ -127,7 +129,7 @@ public class AddFactoidOperation extends StandardOperation {
         factoid.setUpdated(LocalDateTime.now());
         factoid.setUserName(event.getUser().getNick());
         factoidDao.save(factoid);
-        getBot().postMessage(event.getChannel(), event.getUser(), Sofia.ok(event.getUser()));
+        getBot().postMessage(event.getChannel(), event.getUser(), Sofia.ok(event.getUser()), event.isTell());
         return true;
     }
 }

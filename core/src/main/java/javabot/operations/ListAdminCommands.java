@@ -18,8 +18,9 @@ public class ListAdminCommands extends AdminCommand {
                                 .stream()
                                 .map(AdminCommand::getCommandName)
                                 .collect(Collectors.toList());
-        getBot().postMessage(event.getChannel(), event.getUser(), Sofia.adminKnownCommands(event.getUser().getNick(),
-                                                                                           String.join(", ", list)));
+        getBot().postMessage(event.getChannel(), event.getUser(),
+                             Sofia.adminKnownCommands(event.getUser().getNick(), String.join(", ", list)),
+                             event.isTell());
     }
 
     public List<AdminCommand> listCommands() {

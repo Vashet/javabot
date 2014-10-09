@@ -117,7 +117,7 @@ public class GetFactoidOperationTest extends BaseOperationTest {
                                   TEST_NICK));
         sleep(6000);
         testMessage(String.format("~~ %s seeTest", TEST_NICK), String.format("%s, I'm a reply!", TEST_NICK));
-        testMessage(String.format("~~ %s bobloblaw", TEST_NICK), Sofia.unhandledMessage(TEST_NICK));
+        testMessage(String.format("~~ %s bobloblaw", TEST_NICK), Sofia.unhandledMessage(getTestUser().getNick()));
         testMessage(String.format("~~ %s api", TEST_NICK),
                     String.format("%s, api is http://java.sun.com/javase/current/docs/api/index.html", TEST_NICK));
         validate("camel I am a test 2", "IAmATest2");
@@ -132,7 +132,7 @@ public class GetFactoidOperationTest extends BaseOperationTest {
                                   TEST_NICK));
 
         testMessage(String.format("~~%s seeTest", TEST_NICK), String.format("%s, I'm a reply!", TEST_NICK));
-        testMessage(String.format("~~%s bobloblaw", TEST_NICK), Sofia.unhandledMessage(TEST_NICK));
+        testMessage(String.format("~~%s bobloblaw", TEST_NICK), Sofia.unhandledMessage(getTestUser().getNick()));
 
         testMessage(String.format("~~%s api", TEST_NICK),
                     String.format("%s, api is http://java.sun.com/javase/current/docs/api/index.html", TEST_NICK));

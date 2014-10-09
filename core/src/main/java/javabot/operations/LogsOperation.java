@@ -6,14 +6,9 @@ import javabot.Message;
 import javabot.model.Logs;
 import javabot.model.criteria.LogsCriteria;
 import org.mongodb.morphia.Datastore;
-import org.pircbotx.User;
-import org.pircbotx.hooks.events.MessageEvent;
 
 import javax.inject.Inject;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 @SPI(BotOperation.class)
 public class LogsOperation extends BotOperation {
@@ -24,7 +19,7 @@ public class LogsOperation extends BotOperation {
 
     @Override
     public boolean handleMessage(final Message event) {
-        final String message = event.getMessage();
+        final String message = event.getValue();
         if (message.toLowerCase().startsWith(KEYWORD_LOGS)) {
             final String nickname = message.substring(KEYWORD_LOGS.length()).trim();
             LogsCriteria criteria = new LogsCriteria(ds);
@@ -40,14 +35,14 @@ public class LogsOperation extends BotOperation {
             for (Logs logs : criteria.query().fetch()) {
                 getBot().postMessage(event.getChannel(), event.getUser(),
                                      Sofia.logsEntry(logs.getUpdated().format(DateTimeFormatter.ofPattern("HH:mm")),
-                                                     logs.getNick(), logs.getMessage()));
+                                                     logs.getNick(), logs.getMessage()), event.isTell());
                 handled = true;
             }
             if (!handled) {
                 if (nickname.isEmpty()) {
-                    getBot().postMessage(event.getChannel(), event.getUser(), Sofia.logsNone());
+                    getBot().postMessage(event.getChannel(), event.getUser(), Sofia.logsNone(), event.isTell());
                 } else {
-                    getBot().postMessage(event.getChannel(), event.getUser(), Sofia.logsNoneForNick(nickname));
+                    getBot().postMessage(event.getChannel(), event.getUser(), Sofia.logsNoneForNick(nickname), event.isTell());
                 }
             }
             return true;

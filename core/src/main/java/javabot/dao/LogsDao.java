@@ -30,7 +30,6 @@ public class LogsDao extends BaseDao<Logs> {
     }
 
     public void logMessage(final Type type, final Channel channel, final User user, final String message) {
-        System.out.println("type = [" + type + "], channel = [" + channel + "], user = [" + user + "], message = [" + message + "]");
         final Logs logMessage = new Logs();
         logMessage.setType(type);
         if (user != null) {

@@ -22,10 +22,10 @@ public class EnableOperation extends OperationsCommand {
             Config config = configDao.get();
             config.getOperations().add(name);
             configDao.save(config);
-            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.adminOperationEnabled(name));
+            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.adminOperationEnabled(name), event.isTell());
             listCurrent(event);
         } else {
-            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.adminOperationNotEnabled(name));
+            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.adminOperationNotEnabled(name), event.isTell());
         }
     }
 }

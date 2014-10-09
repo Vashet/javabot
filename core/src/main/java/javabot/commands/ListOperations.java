@@ -11,9 +11,10 @@ public class ListOperations extends OperationsCommand {
     @Override
     public void execute(final Message event) {
         getBot().postMessage(event.getChannel(), event.getUser(),
-                             Sofia.adminKnownOperations(event.getUser().getNick(), StringUtils.join(BotOperation.list().iterator(), ",")));
+                             Sofia.adminKnownOperations(event.getUser().getNick(), StringUtils.join(BotOperation.list().iterator(), ",")),
+                             event.isTell());
 
         listCurrent(event);
-        getBot().postMessage(event.getChannel(), event.getUser(), Sofia.adminOperationInstructions());
+        getBot().postMessage(event.getChannel(), event.getUser(), Sofia.adminOperationInstructions(), event.isTell());
     }
 }

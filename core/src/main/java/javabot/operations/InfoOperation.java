@@ -23,7 +23,7 @@ public class InfoOperation extends BotOperation {
 
     @Override
     public boolean handleMessage(final Message event) {
-        final String message = event.getMessage().toLowerCase();
+        final String message = event.getValue().toLowerCase();
         final Channel channel = event.getChannel();
         if (message.startsWith("info ")) {
             final String key = message.substring("info ".length());
@@ -32,10 +32,13 @@ public class InfoOperation extends BotOperation {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern(INFO_DATE_FORMAT);
                 LocalDateTime updated = factoid.getUpdated();
                 String formatted = formatter.format(updated);
-                getBot().postMessage(channel, event.getUser(), Sofia.factoidInfo(key, factoid.getLocked() ? "*" : "", factoid.getUserName(),
-                                                                                 formatted, factoid.getValue()));
+                getBot().postMessage(channel, event.getUser(),
+                                     Sofia.factoidInfo(key, factoid.getLocked() ? "*" : "", factoid.getUserName(),
+                                                       formatted, factoid.getValue()),
+                                     event.isTell());
             } else {
-                getBot().postMessage(channel, event.getUser(), Sofia.factoidUnknown(key));
+                getBot().postMessage(channel, event.getOriginalUser(), Sofia.factoidUnknown(key),
+                                     event.isTell() && event.getSender() == null);
             }
             return true;
         }

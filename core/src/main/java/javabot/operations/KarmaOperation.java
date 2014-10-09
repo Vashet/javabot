@@ -26,7 +26,7 @@ public class KarmaOperation extends BotOperation {
     public boolean handleMessage(final Message event) {
         boolean handled = readKarma(event);
         if (!handled) {
-            String message = event.getMessage();
+            String message = event.getValue();
             final User sender = event.getUser();
             final Channel channel = event.getChannel();
             int operationPointer = message.indexOf("++");
@@ -66,13 +66,13 @@ public class KarmaOperation extends BotOperation {
             }
             // got an empty nick; spaces only?
             if (!nick.isEmpty() && !channel.getName().startsWith("#")) {
-                getBot().postMessage(channel, event.getUser(), Sofia.privmsgChange());
+                getBot().postMessage(channel, event.getUser(), Sofia.privmsgChange(), event.isTell());
                 handled = true;
             }
             if (!handled) {
                 if (nick.equalsIgnoreCase(sender.getNick())) {
                     if (increment) {
-                        getBot().postMessage(channel, event.getUser(), Sofia.karmaOwnIncrement());
+                        getBot().postMessage(channel, event.getUser(), Sofia.karmaOwnIncrement(), event.isTell());
                     }
                     increment = false;
                 }
@@ -93,5 +93,29 @@ public class KarmaOperation extends BotOperation {
         }
         return true;
     }
+
+    public boolean readKarma(final Message event) {
+           final String message = event.getValue();
+           final Channel channel = event.getChannel();
+           final User sender = event.getUser();
+           if (message.startsWith("karma ")) {
+               final String nick = message.substring("karma ".length()).toLowerCase();
+               final Karma karma = dao.find(nick);
+               if (karma != null) {
+                   getBot().postMessage(channel, event.getUser(), nick.equalsIgnoreCase(sender.getNick())
+                                                                  ? Sofia.karmaOwnValue(sender.getNick(), karma.getValue())
+                                                                  : Sofia.karmaOthersValue(nick, karma.getValue(), sender.getNick())
+                                           , event.isTell());
+               } else {
+                   getBot().postMessage(channel, event.getUser(), sender.getNick().equals(nick)
+                                                                  ? Sofia.karmaOwnNone(sender.getNick())
+                                                                  : Sofia.karmaOthersNone(nick, sender.getNick())
+                                           , event.isTell());
+               }
+               return true;
+   
+           }
+           return false;
+       }
 
 }

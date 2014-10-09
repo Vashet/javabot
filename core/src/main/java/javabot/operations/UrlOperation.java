@@ -13,12 +13,13 @@ public abstract class UrlOperation extends BotOperation {
 
     @Override
     public boolean handleMessage(final Message event) {
-        String message = event.getMessage();
+        String message = event.getValue();
         if (message.startsWith(getTrigger())) {
             message = message.substring(getTrigger().length());
             try {
                 getBot().postMessage(event.getChannel(), event.getUser(),
-                                     getBaseUrl() + URLEncoder.encode(message, Charset.defaultCharset().displayName()));
+                                     getBaseUrl() + URLEncoder.encode(message, Charset.defaultCharset().displayName()),
+                                     event.isTell());
                 return true;
             } catch (UnsupportedEncodingException e) {
                 log.error(e.getMessage(), e);

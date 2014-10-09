@@ -25,12 +25,12 @@ public class NickServLookup extends AdminCommand {
         try {
             NickServInfo info = validateNickServAccount();
             if (info == null) {
-                getJavabot().postMessage(null, event.getUser(), Sofia.noNickservEntry(name));
+                getJavabot().postMessage(null, event.getUser(), Sofia.noNickservEntry(name), event.isTell());
             } else {
-                info.toNickServFormat().stream().forEach(line -> getJavabot().postMessage(null, event.getUser(), line));
+                info.toNickServFormat().stream().forEach(line -> getJavabot().postMessage(null, event.getUser(), line, event.isTell()));
             }
         } catch (ConditionTimeoutException e) {
-            getJavabot().postMessage(null, event.getUser(), Sofia.noNickservEntry(name));
+            getJavabot().postMessage(null, event.getUser(), Sofia.noNickservEntry(name), event.isTell());
         }
     }
 

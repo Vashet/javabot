@@ -1,7 +1,6 @@
 package javabot.admin;
 
 import com.jayway.awaitility.Awaitility;
-import javabot.Message;
 import javabot.Messages;
 import javabot.commands.AdminCommand;
 import javabot.operations.BaseOperationTest;
@@ -22,10 +21,10 @@ public class AdminOperationTest extends BaseOperationTest {
     private Messages messages;
 
     public void disableOperations() {
-        final List<Message> messages = sendMessage("~admin listOperations");
+        final Messages messages = sendMessage("~admin listOperations");
         List<String> disabled = new ArrayList<>();
         try {
-            for (final String name : messages.get(2).getMessage().split(",")) {
+            for (final String name : messages.get(2).split(",")) {
                 final String opName = name.trim().split(" ")[0].trim();
                 disabled.add(opName);
                 sendMessage("~admin disableOperation --name=" + opName);
@@ -51,8 +50,8 @@ public class AdminOperationTest extends BaseOperationTest {
 
     @Test(dependsOnMethods = {"disableOperations"})
     public void enableOperations() {
-        List<Message> list = sendMessage("~admin listOperations");
-        final String message = list.get(2).getMessage();
+        Messages list = sendMessage("~admin listOperations");
+        final String message = list.get(2);
         for (final String name : message.split(",")) {
             final String opName = name.trim().split(" ")[0];
             sendMessage("~admin enableOperation --name=" + opName);

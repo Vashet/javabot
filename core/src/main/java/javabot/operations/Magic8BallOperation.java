@@ -33,10 +33,10 @@ public class Magic8BallOperation extends BotOperation {
 
     @Override
     public boolean handleMessage(final Message event) {
-        final String message = event.getMessage().toLowerCase();
+        final String message = event.getValue().toLowerCase();
         final Channel channel = event.getChannel();
         if (message.startsWith("should i ") || message.startsWith("magic8 ")) {
-            getBot().postMessage(channel, event.getUser(), responses[((int) (Math.random() * responses.length))]);
+            getBot().postMessage(channel, event.getUser(), responses[((int) (Math.random() * responses.length))], event.isTell());
             return true;
         }
         return false;

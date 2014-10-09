@@ -36,11 +36,12 @@ public class UnixCommandOperation extends BotOperation {
 
     @Override
     public boolean handleChannelMessage(final Message event) {
-        final String message = event.getMessage();
+        final String message = event.getValue();
         final Channel channel = event.getChannel();
         final String[] split = message.split(" ");
         if (split.length != 0 && split.length < 3 && commands.contains(split[0])) {
-            getBot().postMessage(channel, event.getUser(), Sofia.botUnixCommand(event.getUser().getNick(), getInsult()));
+            getBot().postMessage(channel, event.getUser(), Sofia.botUnixCommand(event.getUser().getNick(), getInsult()),
+                                 event.isTell());
             return true;
         }
         return false;

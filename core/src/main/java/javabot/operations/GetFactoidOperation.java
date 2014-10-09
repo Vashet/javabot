@@ -28,7 +28,7 @@ public class GetFactoidOperation extends StandardOperation {
     }
 
     private boolean getFactoid(final TellSubject subject, final Message event, final Set<String> backtrack) {
-        String message = event.getMessage();
+        String message = event.getValue();
         if (message.endsWith(".") || message.endsWith("?") || message.endsWith("!")) {
             message = message.substring(0, message.length() - 1);
         }
@@ -48,56 +48,57 @@ public class GetFactoidOperation extends StandardOperation {
         final String message = factoid.evaluate(subject, sender, replacedValue);
         if (message.startsWith("<see>")) {
             if (backtrack.contains(message)) {
-                getBot().postMessage(event.getChannel(), null, Sofia.factoidLoop(message));
+                getBot().postMessage(event.getChannel(), null, Sofia.factoidLoop(message), event.isTell());
                 return true;
             } else {
                 backtrack.add(message);
-                return getFactoid(subject, event, backtrack);
+                return getFactoid(subject, new Message(event, message.substring(5).trim()), backtrack);
             }
         } else if (message.startsWith("<reply>")) {
-            getBot().postMessage(event.getChannel(), null, message.substring("<reply>".length()));
+            getBot().postMessage(event.getChannel(), event.getUser(), message.substring("<reply>".length()),
+                                 event.isTell() && !message.contains(event.getUser().getNick()));
             return true;
         } else if (message.startsWith("<action>")) {
             getBot().postAction(event.getChannel(), message.substring("<action>".length()));
             return true;
         } else {
-            getBot().postMessage(event.getChannel(), null, message);
+            getBot().postMessage(event.getChannel(), event.getUser(), message, event.isTell());
             return true;
         }
     }
 
     private boolean tell(final Message event) {
-        final String message = event.getMessage();
+        final String message = event.getValue();
         final Channel channel = event.getChannel();
         final User sender = event.getUser();
         boolean handled = false;
         if (isTellCommand(message)) {
             final TellSubject tellSubject = parseTellSubject(event);
             if (tellSubject == null) {
-                getBot().postMessage(event.getChannel(), event.getUser(), Sofia.factoidTellSyntax(sender));
+                getBot().postMessage(event.getChannel(), event.getUser(), Sofia.factoidTellSyntax(sender), event.isTell());
                 handled = true;
             } else {
-                User user = tellSubject.getTarget();
-                if (user != null) {
-                    if ("me".equalsIgnoreCase(user.getNick())) {
-                        user = sender;
+                User targetUser = tellSubject.getTarget();
+                if (targetUser != null) {
+                    if ("me".equalsIgnoreCase(targetUser.getNick())) {
+                        targetUser = sender;
                     }
                     final String thing = tellSubject.getSubject();
-                    if (user.getNick().equalsIgnoreCase(ircBot.get().getNick())) {
-                        getBot().postMessage(event.getChannel(), event.getUser(), Sofia.botSelfTalk());
+                    if (targetUser.getNick().equalsIgnoreCase(getBot().getNick())) {
+                        getBot().postMessage(event.getChannel(), event.getUser(), Sofia.botSelfTalk(), true);
                         handled = true;
                     } else {
-                        if (!getBot().isOnCommonChannel(user)) {
-                            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.userNotInChannel(user, channel));
+                        if (!getBot().isOnCommonChannel(targetUser)) {
+                            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.userNotInChannel(targetUser, channel), true);
                             handled = true;
-                        } else if (sender.getNick().equals(channel.getName()) && !getBot().isOnCommonChannel(user)) {
-                            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.userNoSharedChannels());
+                        } else if (sender.getNick().equals(channel.getName()) && !getBot().isOnCommonChannel(targetUser)) {
+                            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.userNoSharedChannels(), true);
                             handled = true;
                         } else if (thing.endsWith("++") || thing.endsWith("--")) {
-                            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.notAllowed());
+                            getBot().postMessage(event.getChannel(), event.getUser(), Sofia.notAllowed(), true);
                             handled = true;
                         } else {
-                            handled = getBot().getResponses(new Message(channel, user, thing), event.getUser());
+                            handled = getBot().getResponses(new Message(channel, targetUser, thing, sender), event.getUser());
                         }
                     }
                 }
@@ -107,7 +108,7 @@ public class GetFactoidOperation extends StandardOperation {
     }
 
     private TellSubject parseTellSubject(final Message event) {
-        String message = event.getMessage();
+        String message = event.getValue();
         if (message.startsWith("tell ")) {
             return parseLonghand(event);
         }
@@ -115,7 +116,7 @@ public class GetFactoidOperation extends StandardOperation {
     }
 
     private TellSubject parseLonghand(final Message event) {
-        String message = event.getMessage();
+        String message = event.getValue();
         final String body = message.substring("tell ".length());
         final String nick = body.substring(0, body.indexOf(" "));
         final int about = body.indexOf("about ");
@@ -127,7 +128,7 @@ public class GetFactoidOperation extends StandardOperation {
     }
 
     private TellSubject parseShorthand(final Message event) {
-        String target = event.getMessage();
+        String target = event.getValue();
         for (final String start : getBot().getStartStrings()) {
             if (target.startsWith(start)) {
                 target = target.substring(start.length()).trim();

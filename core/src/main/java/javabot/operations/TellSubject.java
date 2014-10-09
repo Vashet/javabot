@@ -21,6 +21,6 @@ public final class TellSubject {
 
     @Override
     public String toString() {
-        return String.format("TellSubject{subject='%s', target='%s'}", subject, target);
+        return String.format("TellSubject{subject='%s', target='%s'}", subject, target.getNick());
     }
 }

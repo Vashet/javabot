@@ -33,9 +33,10 @@ public class AolBonicsOperation extends BotOperation {
 
     @Override
     public boolean handleChannelMessage(final Message event) {
-        for (final String bad : event.getMessage().split(" ")) {
+        for (final String bad : event.getValue().split(" ")) {
             if (phrases.contains(bad.toLowerCase().replaceAll("!|\\.|\\?|,", ""))) {
-                getBot().postMessage(event.getChannel(), event.getUser(), Sofia.botAolbonics(event.getUser().getNick()));
+                getBot().postMessage(event.getChannel(), event.getUser(), Sofia.botAolbonics(event.getUser().getNick()),
+                                     event.isTell());
                 return true;
             }
         }

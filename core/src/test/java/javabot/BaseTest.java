@@ -26,12 +26,15 @@ import org.testng.annotations.Guice;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Guice(modules = {JavabotTestModule.class})
 public class BaseTest {
     public static final String TEST_NICK = "jbtestuser";
+
+    public static final String TEST_USER_NICK = "botuser";
+
+    public static final String TEST_BOT_NICK = "testjavabot";
 
     public EnumSet<State> done = EnumSet.of(State.COMPLETED, State.FAILED);
 
@@ -101,13 +104,13 @@ public class BaseTest {
 
     public User getTestUser() {
         if (testUser == null) {
-            testUser = userFactory.createUser(TEST_NICK, TEST_NICK, "hostmask");
+            testUser = userFactory.createUser(TEST_USER_NICK, TEST_USER_NICK, "hostmask");
         }
         return testUser;
     }
 
-    public List<Message> getMessages() {
-        return messages.get();
+    public Messages getMessages() {
+        return messages;
     }
 
     public final TestJavabot getJavabot() {
@@ -120,7 +123,6 @@ public class BaseTest {
 
     protected org.pircbotx.Channel getJavabotChannel() {
         org.pircbotx.Channel channel = getIrcBot().getUserChannelDao().getChannel("#jbunittest");
-        System.out.println("channel = " + channel);
         assert channel != null;
         return channel;
     }
