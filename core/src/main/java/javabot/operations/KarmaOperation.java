@@ -65,33 +65,34 @@ public class KarmaOperation extends BotOperation {
                 throw e;
             }
             // got an empty nick; spaces only?
-            if (!nick.isEmpty() && !channel.getName().startsWith("#")) {
-                getBot().postMessage(channel, event.getUser(), Sofia.privmsgChange(), event.isTell());
-                handled = true;
-            }
-            if (!handled) {
-                if (nick.equalsIgnoreCase(sender.getNick())) {
-                    if (increment) {
-                        getBot().postMessage(channel, event.getUser(), Sofia.karmaOwnIncrement(), event.isTell());
-                    }
-                    increment = false;
-                }
-                Karma karma = dao.find(nick);
-                if (karma == null) {
-                    karma = new Karma();
-                    karma.setName(nick);
-                }
-                if (increment) {
-                    karma.setValue(karma.getValue() + 1);
+            if (!nick.isEmpty()) {
+                if (!channel.getName().startsWith("#")) {
+                    getBot().postMessage(channel, event.getUser(), Sofia.privmsgChange(), event.isTell());
+                    handled = true;
                 } else {
-                    karma.setValue(karma.getValue() - 1);
+                    if (nick.equalsIgnoreCase(sender.getNick())) {
+                        if (increment) {
+                            getBot().postMessage(channel, event.getUser(), Sofia.karmaOwnIncrement(), event.isTell());
+                        }
+                        increment = false;
+                    }
+                    Karma karma = dao.find(nick);
+                    if (karma == null) {
+                        karma = new Karma();
+                        karma.setName(nick);
+                    }
+                    if (increment) {
+                        karma.setValue(karma.getValue() + 1);
+                    } else {
+                        karma.setValue(karma.getValue() - 1);
+                    }
+                    karma.setUserName(sender.getNick());
+                    dao.save(karma);
+                    handled = readKarma(new Message(event.getChannel(), event.getUser(), "karma " + nick));
                 }
-                karma.setUserName(sender.getNick());
-                dao.save(karma);
-                return readKarma(new Message(event.getChannel(), event.getUser(), "karma " + nick));
             }
         }
-        return true;
+        return handled;
     }
 
     public boolean readKarma(final Message event) {

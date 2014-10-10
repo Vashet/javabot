@@ -55,32 +55,29 @@ public class Throttler extends BaseDao<ThrottleItem> {
     }
 
     private void validateNickServAccount(final User user) {
-        if (ircBot.get().isConnected()) {
-            AtomicReference<NickServInfo> info = new AtomicReference<>(nickServDao.find(user.getNick()));
-            if (info.get() == null) {
-                ircBot.get().sendIRC().message("NickServ", "info " + user.getNick());
-                Sofia.logWaitingForNickserv(user.getNick());
-                try {
-                    Awaitility.await()
-                              .atMost(15, TimeUnit.SECONDS)
-                              .until(() -> {
-                                  info.set(nickServDao.find(user.getNick()));
-                                  return info.get() != null;
-                              });
-                } catch (ConditionTimeoutException e) {
-                    Sofia.logNoNickservEntry(user.getNick());
-                    throw new NickServViolationException(Sofia.unknownUser());
-                }
-            }
-            NickServInfo nickServInfo = info.get();
-            if (nickServInfo == null) {
+        AtomicReference<NickServInfo> info = new AtomicReference<>(nickServDao.find(user.getNick()));
+        if (info.get() == null) {
+            ircBot.get().sendIRC().message("NickServ", "info " + user.getNick());
+            Sofia.logWaitingForNickserv(user.getNick());
+            try {
+                Awaitility.await()
+                          .atMost(15, TimeUnit.SECONDS)
+                          .until(() -> {
+                              info.set(nickServDao.find(user.getNick()));
+                              return info.get() != null;
+                          });
+            } catch (ConditionTimeoutException e) {
                 Sofia.logNoNickservEntry(user.getNick());
                 throw new NickServViolationException(Sofia.unknownUser());
             }
-            if (Duration.between(nickServInfo.getRegistered(), now()).toDays() < configDao.get().getMininumNickServAge()) {
-                throw new NickServViolationException(Sofia.accountTooNew());
-            }
+        }
+        NickServInfo nickServInfo = info.get();
+        if (nickServInfo == null) {
+            Sofia.logNoNickservEntry(user.getNick());
+            throw new NickServViolationException(Sofia.unknownUser());
+        }
+        if (Duration.between(nickServInfo.getRegistered(), now()).toDays() < configDao.get().getMininumNickServAge()) {
+            throw new NickServViolationException(Sofia.accountTooNew());
         }
     }
-
 }

@@ -16,7 +16,7 @@ public class LockFactoidTest extends BaseOperationTest {
     @Test(dataProvider = "factoids")
     public void lock(final String name) {
         try {
-            sendMessage("~forget " + name);
+            sendMessage("~forget " + name).get();
             testMessage("~" + name + " is i should be locked", "OK, " + getTestUser().getNick() + ".");
             testMessage("~admin lock " + name, name + " locked.");
 
@@ -33,7 +33,7 @@ public class LockFactoidTest extends BaseOperationTest {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            sendMessage("~forget " + name);
+            sendMessage("~forget " + name).get();
         }
     }
 }

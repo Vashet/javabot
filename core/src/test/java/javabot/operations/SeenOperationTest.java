@@ -6,6 +6,6 @@ import org.testng.annotations.Test;
 public class SeenOperationTest extends BaseOperationTest {
   @Test
   public void seen() {
-    testMessage("~seen jimmyjimjim", Sofia.seenUnknown("jbtestuser", "jimmyjimjim"));
+    testMessage("~seen jimmyjimjim", Sofia.seenUnknown(getTestUser().getNick(), "jimmyjimjim"));
   }
 }

@@ -71,7 +71,7 @@ public class BaseTest {
     @Inject
     private Messages messages;
 
-    public String ok;
+    public final String ok = "OK, " + TEST_USER_NICK.substring(0, Math.min(TEST_USER_NICK.length(), 16)) + ".";
 
     private User testUser;
 
@@ -94,7 +94,6 @@ public class BaseTest {
         datastore.delete(logsDao.getQuery(Logs.class));
         datastore.delete(changeDao.getQuery(Change.class));
 
-        ok = "OK, " + TEST_NICK.substring(0, Math.min(TEST_NICK.length(), 16)) + ".";
     }
 
     @BeforeMethod

@@ -55,7 +55,7 @@ public class AddFactoidOperationTest extends BaseOperationTest {
 
     @Test
     public void blankValue() {
-        testMessage("~pong is", Sofia.unhandledMessage("jbtestuser"));
+        testMessage("~pong is", Sofia.unhandledMessage(getTestUser().getNick()));
     }
 
     public void addLog() {

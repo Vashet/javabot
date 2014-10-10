@@ -97,11 +97,11 @@ public class GetFactoidOperationTest extends BaseOperationTest {
     }
 
     public void noGuess() {
-        testMessage("~apiz", Sofia.unhandledMessage(TEST_NICK));
+        testMessage("~apiz", Sofia.unhandledMessage(getTestUser().getNick()));
     }
 
     public void action() {
-        testMessage("~hug " + getTestUser(), " hugs " + getTestUser());
+        testMessage("~hug " + TEST_NICK, " hugs " + TEST_NICK);
     }
 
     @Test

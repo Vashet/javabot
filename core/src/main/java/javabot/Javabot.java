@@ -218,6 +218,7 @@ public class Javabot {
                     try {
                         if (throttler.isThrottled(message.getUser())) {
                             postMessage(null, message.getUser(), Sofia.throttledUser(), false);
+                            handled = true;
                         } else {
                             String content = message.getValue().substring(startString.length()).trim();
                             while (!content.isEmpty() && (content.charAt(0) == ':' || content.charAt(0) == ',')) {
