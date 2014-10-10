@@ -78,28 +78,6 @@ public abstract class AdminCommand extends BotOperation {
 
     public abstract void execute(Message event);
 
-    public String getUsage() {
-        final Options options = getOptions();
-        final StringBuilder builder = new StringBuilder("usage: " + getCommandName());
-        for (final Object o : options.getOptions()) {
-            final Option option = (Option) o;
-            builder.append(" ");
-            if (!option.isRequired()) {
-                builder.append(" [");
-            }
-            builder.append("--" + option.getOpt());
-            if (option.getValue() != null) {
-                builder.append("=" + option.getValue());
-            } else {
-                builder.append("=<" + option.getOpt() + ">");
-            }
-            if (!option.isRequired()) {
-                builder.append("]");
-            }
-        }
-        return builder.toString();
-    }
-
     public Options getOptions() {
         final Options options = new Options();
         for (final Field field : getClass().getDeclaredFields()) {
@@ -121,6 +99,7 @@ public abstract class AdminCommand extends BotOperation {
         return options;
     }
 
+    @SuppressWarnings("unchecked")
     public final void parse(final List<String> params) throws ParseException {
         int index = 2;
         while (index < params.size()) {
@@ -133,7 +112,6 @@ public abstract class AdminCommand extends BotOperation {
         final Options options = getOptions();
         final CommandLineParser parser = new GnuParser();
         final CommandLine line = parser.parse(options, params.toArray(new String[params.size()]));
-        //noinspection unchecked
         args = line.getArgList();
         try {
             final Iterator iterator = line.iterator();
