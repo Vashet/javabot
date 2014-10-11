@@ -9,7 +9,7 @@ import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Indexed;
 import org.pircbotx.User;
 
-@Entity("throttled")
+@Entity(value = "throttled", noClassnameStored = true)
 public class ThrottleItem implements Persistent {
   @Id
   private ObjectId id;

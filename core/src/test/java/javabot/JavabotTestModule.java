@@ -105,17 +105,17 @@ public class JavabotTestModule extends JavabotModule {
             return new OutputRaw(bot, 0) {
                 @Override
                 public void rawLine(final String line) {
-                    System.out.println("line = [" + line + "]");
+                    new Exception("line = [" + line + "]").printStackTrace();
                 }
 
                 @Override
                 public void rawLineNow(final String line) {
-                    System.out.println("line = [" + line + "]");
+                    new Exception("line = [" + line + "]").printStackTrace();
                 }
 
                 @Override
                 public void rawLineNow(final String line, final boolean resetDelay) {
-                    System.out.println("line = [" + line + "], resetDelay = [" + resetDelay + "]");
+                    new Exception("line = [" + line + "], resetDelay = [" + resetDelay + "]").printStackTrace();
                 }
 
                 @Override

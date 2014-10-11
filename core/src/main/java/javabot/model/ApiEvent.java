@@ -1,7 +1,6 @@
 package javabot.model;
 
 import com.google.inject.Provider;
-import javabot.Javabot;
 import javabot.dao.AdminDao;
 import javabot.dao.ApiDao;
 import javabot.javadoc.JavadocApi;

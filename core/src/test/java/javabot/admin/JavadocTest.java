@@ -2,7 +2,6 @@ package javabot.admin;
 
 import com.jayway.awaitility.Awaitility;
 import com.jayway.awaitility.Duration;
-import javabot.Messages;
 import javabot.dao.ApiDao;
 import javabot.dao.EventDao;
 import javabot.dao.JavadocClassDao;
@@ -34,9 +33,6 @@ public class JavadocTest extends BaseOperationTest {
     @Inject
     private EventDao eventDao;
 
-    @Inject
-    private Messages messages;
-
     @Test
     public void servlets() throws IOException {
         String apiName = "Servlet";
@@ -52,7 +48,7 @@ public class JavadocTest extends BaseOperationTest {
         ApiEvent event = new ApiEvent(EventType.RELOAD, getTestUser().getNick(), apiDao.find(apiName).getId());
         eventDao.save(event);
         waitForEvent(event, "reloading " + apiName, new Duration(30, TimeUnit.MINUTES));
-        messages.get();
+        getMessages().get();
         checkServlets(apiName);
     }
 
@@ -98,7 +94,7 @@ public class JavadocTest extends BaseOperationTest {
                                           new File(System.getProperty("java.home"), "lib/rt.jar").toURI().toURL().toString());
             eventDao.save(event);
             waitForEvent(event, "adding JDK", new Duration(30, TimeUnit.MINUTES));
-            messages.get();
+            getMessages().get();
             api = apiDao.find("JDK");
         }
         Assert.assertEquals(javadocClassDao.getClass(api, "java.lang", "Integer").length, 1);
@@ -109,7 +105,7 @@ public class JavadocTest extends BaseOperationTest {
         eventDao.save(event);
         waitForEvent(event, "adding " + apiName, new Duration(30, TimeUnit.MINUTES));
         LOG.info("done waiting for event to finish");
-        messages.get();
+        getMessages().get();
     }
 
     private void dropApi(final String apiName) {
@@ -120,6 +116,6 @@ public class JavadocTest extends BaseOperationTest {
         Awaitility.await()
                   .atMost(60, TimeUnit.SECONDS)
                   .until(() -> apiDao.find(apiName) == null);
-        messages.get();
+        getMessages().get();
     }
 }

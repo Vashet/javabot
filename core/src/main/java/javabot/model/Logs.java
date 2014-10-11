@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Entity(value = "logs", noClassnameStored = true)
 @Indexes({
-             @Index(value = "channel, updated, upperNick", name = "seen")
+             @Index(value = "channel, upperNick, updated", name = "seen"),
          })
 @SPI(Persistent.class)
 public class Logs implements Persistent {

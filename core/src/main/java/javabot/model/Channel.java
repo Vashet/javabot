@@ -2,7 +2,6 @@ package javabot.model;
 
 import com.antwerkz.maven.SPI;
 import com.fasterxml.jackson.annotation.JsonView;
-import javabot.Javabot;
 import javabot.json.Views.PUBLIC;
 import javabot.json.Views.SYSTEM;
 import org.bson.types.ObjectId;
@@ -11,13 +10,11 @@ import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Index;
 import org.mongodb.morphia.annotations.Indexes;
 import org.mongodb.morphia.annotations.PrePersist;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Entity("channels")
+@Entity(value = "channels", noClassnameStored = true)
 @SPI(Persistent.class)
 @Indexes({
              @Index(value = "upperName", unique = true, dropDups = true)

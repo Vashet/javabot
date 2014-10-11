@@ -15,7 +15,7 @@ import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Indexed;
 import org.pircbotx.User;
 
-@Entity("nickserv")
+@Entity(value = "nickserv", noClassnameStored = true)
 public class NickServInfo implements Persistent {
   public static final String NSERV_DATE_FORMAT = "MMM dd HH:mm:ss yyyy";
 
