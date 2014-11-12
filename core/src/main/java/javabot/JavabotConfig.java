@@ -50,4 +50,8 @@ public interface JavabotConfig extends Config {
 
     @Key("javabot.bitly.secret")
     String bitlySecret();
+
+    @Key("start.web.app")
+    @DefaultValue("true")
+    Boolean startWebApp();
 }

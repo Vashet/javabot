@@ -23,6 +23,7 @@ import javabot.operations.OperationComparator;
 import javabot.operations.StandardOperation;
 import javabot.operations.throttle.NickServViolationException;
 import javabot.operations.throttle.Throttler;
+import javabot.web.JavabotApplication;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.slf4j.Logger;
@@ -78,6 +79,9 @@ public class Javabot {
     @Inject
     private Provider<PircBotX> ircBot;
 
+    @Inject
+    private JavabotConfig javabotConfig;
+
     private Map<String, BotOperation> allOperations;
 
     private String[] startStrings;
@@ -100,6 +104,7 @@ public class Javabot {
         loadOperations();
         applyUpgradeScripts();
         connect();
+        startWebApp();
     }
 
     private void setUpThreads() {
@@ -138,7 +143,7 @@ public class Javabot {
         if (connected) {
             Set<String> joined = ircBot.getUserChannelDao().getAllChannels()
                                        .stream()
-                                       .map((channel) -> channel.getName())
+                                       .map(org.pircbotx.Channel::getName)
                                        .collect(Collectors.toSet());
             List<Channel> channels = channelDao.getChannels();
             if (joined.size() != channels.size()) {
@@ -182,6 +187,15 @@ public class Javabot {
         }
     }
 
+    public void startWebApp() {
+        if(javabotConfig.startWebApp()) {
+            try {
+                injector.getInstance(JavabotApplication.class).run(new String[]{"server", "javabot.yml"});
+            } catch (Exception e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+        }
+    }
     protected final void applyUpgradeScripts() {
         for (final UpgradeScript script : UpgradeScript.loadScripts()) {
             injector.injectMembers(script);

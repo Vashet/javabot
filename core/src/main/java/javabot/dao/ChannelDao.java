@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.QueryImpl;
-import javabot.Activity;
+import javabot.model.Activity;
 import javabot.dao.util.QueryParam;
 import javabot.model.Channel;
 import javabot.model.criteria.ChannelCriteria;
@@ -66,7 +66,7 @@ public class ChannelDao extends BaseDao<Channel> {
   @SuppressWarnings({"unchecked"})
   public List<Activity> getStatistics() {
 /*
-@NamedQuery(name = ChannelDao.STATISTICS, query = "select new javabot.Activity(l.channel, count(l), max(l.updated),"
+@NamedQuery(name = ChannelDao.STATISTICS, query = "select new javabot.model.Activity(l.channel, count(l), max(l.updated),"
     + " min(l.updated), (select count(e) from Logs e)) from Logs l "
     + "where l.channel like '#%' group by l.channel order by count(l) desc")
 */
