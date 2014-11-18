@@ -30,7 +30,17 @@ public class ChannelDao extends BaseDao<Channel> {
 
   @SuppressWarnings({"unchecked"})
   public List<Channel> getChannels() {
-    return getQuery().asList();
+    return getChannels(false);
+  }
+
+  public List<Channel> getChannels(Boolean showAll) {
+    ChannelCriteria channelCriteria = new ChannelCriteria(ds);
+    if (!showAll) {
+      channelCriteria.logged().equal(true);
+    }
+    Query<Channel> query = channelCriteria.query();
+    query.order("name");
+    return query.asList();
   }
 
   @SuppressWarnings({"unchecked"})
@@ -40,16 +50,6 @@ public class ChannelDao extends BaseDao<Channel> {
       condition = "-" + condition;
     }
     return getQuery().order(condition).asList();
-  }
-
-  public List<Channel> findLogged(Boolean showAll) {
-    ChannelCriteria channelCriteria = new ChannelCriteria(ds);
-    if (!showAll) {
-      channelCriteria.logged().equal(true);
-    }
-    Query<Channel> query = channelCriteria.query();
-    query.order("name");
-    return query.asList();
   }
 
   public boolean isLogged(final String channel) {

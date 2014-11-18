@@ -51,7 +51,15 @@ public interface JavabotConfig extends Config {
     @Key("javabot.bitly.secret")
     String bitlySecret();
 
+    @Key("web.host")
+    @DefaultValue("localhost")
+    String webHost();
+
+    @Key("web.port")
+    @DefaultValue("9000")
+    Integer webPort();
+
     @Key("start.web.app")
-    @DefaultValue("true")
+    @DefaultValue("false")
     Boolean startWebApp();
 }

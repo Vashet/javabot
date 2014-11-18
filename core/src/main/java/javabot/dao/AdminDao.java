@@ -41,10 +41,22 @@ public class AdminDao extends BaseDao<Admin> {
         return adminCriteria.query().get();
     }
 
+    public Admin getAdminByEmailAddress(final String email) {
+        AdminCriteria criteria = new AdminCriteria(ds);
+        criteria.emailAddress(email);
+        Admin admin = criteria.query().get();
+        if(admin == null) {
+            admin = new Admin();
+            admin.setEmailAddress(email);
+            save(admin);
+        }
+        return admin;
+    }
+
     public Admin create(final String ircName, final String userName, final String hostName) {
         final Admin admin = new Admin();
         admin.setIrcName(ircName);
-        admin.setUserName(userName);
+        admin.setEmailAddress(userName);
         admin.setHostName(hostName);
         admin.setUpdated(LocalDateTime.now());
         admin.setBotOwner(findAll().isEmpty());
@@ -59,7 +71,7 @@ public class AdminDao extends BaseDao<Admin> {
         event.setOperation(name);
         event.setRequestedOn(LocalDateTime.now());
         event.setType(EventType.ADD);
-        event.setRequestedBy(admin.getUserName());
+        event.setRequestedBy(admin.getEmailAddress());
         save(event);
         Config config = configDao.get();
         config.getOperations().add(name);
@@ -72,7 +84,7 @@ public class AdminDao extends BaseDao<Admin> {
         event.setOperation(name);
         event.setRequestedOn(LocalDateTime.now());
         event.setType(EventType.DELETE);
-        event.setRequestedBy(admin.getUserName());
+        event.setRequestedBy(admin.getEmailAddress());
         save(event);
         Config config = configDao.get();
         config.getOperations().remove(name);

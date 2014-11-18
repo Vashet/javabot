@@ -1,18 +1,27 @@
 package javabot.web;
 
-import com.google.common.base.Optional;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
-import io.dropwizard.auth.oauth.OAuthProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
 import javabot.JavabotModule;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.mongodb.morphia.Datastore;
+
+import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.EnumSet;
 
 public class JavabotApplication extends Application<JavabotConfiguration> {
     @Inject
@@ -35,14 +44,13 @@ public class JavabotApplication extends Application<JavabotConfiguration> {
 
         environment.jersey().register(injector.getInstance(BotResource.class));
         environment.jersey().register(injector.getInstance(AdminResource.class));
-        OAuthProvider<Object> provider = new OAuthProvider<>(JavabotApplication.this::authenticateUser, "realm");
-        environment.jersey().getResourceConfig().getSingletons().add(provider);
+        PublicOAuthResource oauth = injector.getInstance(PublicOAuthResource.class);
+        oauth.setConfiguration(configuration);
+        environment.jersey().register(oauth);
+        environment.servlets().addFilter("html", new HtmlToResourceFilter())
+                   .addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), false, "*.html");
 
         environment.healthChecks().register("javabot", new JavabotHealthCheck());
-    }
-
-    private Optional<Object> authenticateUser(final String credentials) {
-        return null;
     }
 
     public static void main(String[] args) throws Exception {
@@ -51,4 +59,22 @@ public class JavabotApplication extends Application<JavabotConfiguration> {
              .run(new String[]{"server", "javabot.yml"});
     }
 
+    private static class HtmlToResourceFilter implements Filter {
+        @Override
+        public void init(final FilterConfig filterConfig) throws ServletException {
+
+        }
+
+        @Override
+        public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
+            throws IOException, ServletException {
+            String replace = ((HttpServletRequest) request).getRequestURI().replace(".html", "");
+            request.getRequestDispatcher(replace).forward(request, response);
+        }
+
+        @Override
+        public void destroy() {
+
+        }
+    }
 }

@@ -37,6 +37,15 @@ public class Sofia {
         return (String) getBundle(locale).getObject(key);
     }
 
+    public static String loggingInUser(Object arg0, Locale... locale) {
+        return MessageFormat.format(getMessageValue("@debug.logging.in.user", locale), arg0);
+    }
+
+    public static void logLoggingInUser(Object arg0, Locale... locale) {
+        if(logger.isDebugEnabled()) {
+            logger.debug(loggingInUser(arg0));
+        }
+    }
     public static String noNickservEntry(Object arg0, Locale... locale) {
         return MessageFormat.format(getMessageValue("@info.no.nickserv.entry", locale), arg0);
     }

@@ -27,37 +27,38 @@
 
                 <div id="boxWrapper">
                     <ul class="plain">
-                        <li><a href="//index">Home Page</a></li>
-                        <li><a href="//factoids">Factoids</a>: ${factoidCount} </li>
+                        <li><a href="/">Home Page</a></li>
+                        <li><a href="/factoids">Factoids</a>: ${factoidCount} </li>
                         <!--<li><a wicket:id="activity_link"><span wicket:id="stats">[stats]</span></a></li>-->
-                        <li><a href="//karma">Karma Ranking</a></li>
-                        <li><a href="//changes">Changelog</a></li>
+                        <li><a href="/karma">Karma Ranking</a></li>
+                        <li><a href="/changes">Changelog</a></li>
                     </ul>
                 </div>
             </div>
-            @subjectNotPresent(handler) {
-            <div>
-                <h3><a href="//admin/login">Login</a></h3>
-            </div>
-            }
-            @restrict(List(as("botAdmin"))) {
+            <#if !loggedIn()>
+                <div>
+                    <h3><a href="/auth/login">Login</a></h3>
+                </div>
+            </#if>
+            <#if isAdmin()>
             <div>
                 <h3>Admin</h3>
                 <ul>
-                    <li><a href="/admin">Admins</a></li>
-                    <li><a href="/admin/config">Configuration</a></li>
-                    <li><a href="/admin/javadoc">Javadoc</a></li>
+                    <li><a href="/botadmin">Admins</a></li>
+                    <li><a href="/botadmin/config">Configuration</a></li>
+                    <li><a href="/botadmin/javadoc">Javadoc</a></li>
                 </ul>
             </div>
-            }
+            </#if>
+
             <h3>
                 <table>
                     <tr>
                         <td>Channels</td>
                         <td>
-                            @restrict(List(as("botAdmin"))) {
-                            <a href="//admin/newChannel)}">+</a>
-                            }
+                            <#if isAdmin()>
+                                <a href="/botadmin/newChannel}">+</a>
+                            </#if>
                         </td>
                     </tr>
                 </table>
@@ -65,20 +66,27 @@
 
             <div class="boxWrapper">
                 <table class="plain">
-                    @context.channels.map { logged =>
+                <#list getChannels() as channel>
                     <tr>
                         <td>
-                            <a id="@{logged.getName()}"
-                            @if(logged.getName().equals(context.channel)) { class="current" }
-                            href="@{routes.Application.logs(URLEncoder.encode(logged.getName(), "UTF-8"), "today")}">@{logged.getName()}</a>
+                            <a id="${channel.name}" href="/logs/${encode(channel.name)}/today"
+                                <#if channel.name == getCurrentChannel()>
+                                    class='current'
+                                </#if>
+                            >${channel.name}</a>
                         </td>
-                        @subjectNotPresent(handler) {
-                            <td></td>
-                            <td></td>
-                        }
                     </tr>
-                    }
+                </#list>
                 </table>
+<#--
+                <tr>
+                    <td>
+                        <a id="${channel.name}"
+                        <#if ${channel.getName().equals(currentChannel)}>  class="current"  </#if>
+                            ">${channel.name}</a>
+                    </td>
+                </tr>
+-->
             </div>
             <div>
                 <h3>Credits</h3>

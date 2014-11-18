@@ -3,7 +3,7 @@ server:
   applicationContextPath: /  # Default value*
   connector:
       type: http
-      port: 9000
+      port: 8080
 
 # Logging settings.
 logging:
@@ -21,3 +21,12 @@ logging:
 
   appenders:
     - type: console
+
+oauthSuccessUrl: http://localhost:8080/auth/verify
+
+oauthCfg:
+  - name: googleplus
+    prefix: googleapis.com
+    key: '252062164775-43gpeek32n49pupse6h8a5sdl7dj3ibk.apps.googleusercontent.com'
+    secret: 'Ob0-GVUEgKmvWluXHI36HC9z'
+    permissions: https://www.googleapis.com/auth/userinfo.profile,email
