@@ -18,3 +18,13 @@ Date.prototype.format = function (format) {
 today = function (channel) {
     return encodeURIComponent(channel);
 };
+
+$('.locklink').click(function () {
+    var id = this.id;
+    $.get('toggleLock', 'id=' + id,
+        function (responseText) {
+            $('#' + id).toggleClass('locked')
+        }, 'html'
+    );
+    return false;
+});

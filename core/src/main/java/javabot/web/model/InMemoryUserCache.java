@@ -15,7 +15,7 @@ public enum InMemoryUserCache {
     INSTANCE;
 
     // A lot of threads will hit this cache
-    private volatile Cache<UUID, User> userCache;
+    private volatile Cache<String, User> userCache;
 
     InMemoryUserCache() {
         reset(15, TimeUnit.MINUTES);
@@ -50,7 +50,7 @@ public enum InMemoryUserCache {
      * @param sessionToken The session token to locate the user (not JSESSIONID)
      * @return The matching User or absent
      */
-    public Optional<User> getBySessionToken(UUID sessionToken) {
+    public Optional<User> getBySessionToken(String sessionToken) {
 
         // Check the cache
         Optional<User> userOptional = Optional.fromNullable(userCache.getIfPresent(sessionToken));
@@ -65,14 +65,13 @@ public enum InMemoryUserCache {
     }
 
     /**
-     * @param sessionToken The session token to use to locate the user
      * @param user         The User to cache
      */
-    public void put(UUID sessionToken, User user) {
+    public void put(User user) {
 
         Preconditions.checkNotNull(user);
 
-        userCache.put(sessionToken, user);
+        userCache.put(user.getSessionToken().toString(), user);
     }
 
     public void hardDelete(User user) {
@@ -85,9 +84,9 @@ public enum InMemoryUserCache {
 
     public Optional<User> getByOpenIDIdentifier(String identifier) {
 
-        Map<UUID, User> map = userCache.asMap();
+        Map<String, User> map = userCache.asMap();
 
-        for (Map.Entry<UUID, User> entry : map.entrySet()) {
+        for (Map.Entry<String, User> entry : map.entrySet()) {
             if (entry.getValue().getOpenIDIdentifier().equals(identifier)) {
                 return Optional.of(entry.getValue());
             }
@@ -98,9 +97,9 @@ public enum InMemoryUserCache {
     }
 
     public Optional<User> getByEmailAddress(String emailAddress) {
-        Map<UUID, User> map = userCache.asMap();
+        Map<String, User> map = userCache.asMap();
 
-        for (Map.Entry<UUID, User> entry : map.entrySet()) {
+        for (Map.Entry<String, User> entry : map.entrySet()) {
 
             if (entry.getValue().getEmail().equals(emailAddress)) {
                 return Optional.of(entry.getValue());

@@ -2,6 +2,8 @@ package javabot.web;
 
 import com.google.inject.Injector;
 import io.dropwizard.views.View;
+import javabot.web.views.FactoidsView;
+import javabot.web.views.IndexView;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -9,10 +11,9 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 
 @Path("/")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -37,23 +38,9 @@ public class BotResource {
     @GET
     @Path("/factoids")
     @Produces("text/html;charset=ISO-8859-1")
-    public View factoids(@Context HttpServletRequest request) {
-        return new MainView(injector, request) {
-            @Override
-            public String getChildView() throws IOException, WebApplicationException {
-                return "/factoids.ftl";
-            }
-        };
+    public View factoids(@Context HttpServletRequest request, @QueryParam("page") Integer page) {
+        System.out.println("page = " + page);
+        return new FactoidsView(BotResource.this.injector, request, page == null ? 1 : page);
     }
 
-    public static class IndexView extends MainView {
-        public IndexView(final Injector injector, final HttpServletRequest request) {
-            super(injector, request);
-        }
-
-        @Override
-        public String getChildView() throws IOException, WebApplicationException {
-            return "/index.ftl";
-        }
-    }
 }

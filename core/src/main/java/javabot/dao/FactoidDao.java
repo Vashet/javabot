@@ -116,7 +116,7 @@ public class FactoidDao extends BaseDao<Factoid> {
       criteria.value().contains(filter.getValue().toUpperCase());
     }
     if (!count && qp != null && qp.hasSort()) {
-      criteria.query().order("upper" + qp.getSort() + (qp.isSortAsc() ? " 1" : " -1"));
+      criteria.query().order((qp.isSortAsc() ? "" : "-") + "upper" + qp.getSort());
       criteria.query().offset(qp.getFirst());
       criteria.query().limit(qp.getCount());
     }

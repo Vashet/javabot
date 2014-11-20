@@ -1,4 +1,4 @@
-package javabot.web;
+package javabot.web.views;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
@@ -8,6 +8,7 @@ import javabot.dao.AdminDao;
 import javabot.dao.ChannelDao;
 import javabot.dao.FactoidDao;
 import javabot.model.Channel;
+import javabot.web.JavabotConfiguration;
 import javabot.web.model.InMemoryUserCache;
 import javabot.web.model.User;
 
@@ -47,13 +48,13 @@ public abstract class MainView extends View {
 
     public boolean loggedIn() {
         Cookie cookie = getSessionCookie();
-        return cookie != null && InMemoryUserCache.INSTANCE.getBySessionToken(UUID.fromString(cookie.getValue())).isPresent();
+        return cookie != null && InMemoryUserCache.INSTANCE.getBySessionToken(cookie.getValue()).isPresent();
     }
 
     public boolean isAdmin() {
         Cookie cookie = getSessionCookie();
         if (cookie != null) {
-            Optional<User> optional = InMemoryUserCache.INSTANCE.getBySessionToken(UUID.fromString(cookie.getValue()));
+            Optional<User> optional = InMemoryUserCache.INSTANCE.getBySessionToken(cookie.getValue());
             return optional.isPresent() && adminDao.getAdminByEmailAddress(optional.get().getEmail()) != null;
         } else {
             return false;
@@ -79,5 +80,9 @@ public abstract class MainView extends View {
             }
         }
         return null;
+    }
+
+    public HttpServletRequest getRequest() {
+        return request;
     }
 }

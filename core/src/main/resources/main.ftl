@@ -3,13 +3,8 @@
 <html>
     <head>
         <title>javabot</title>
-
-        <#--<link href="assets/images/favicon.png" rel="shortcut icon" type="image/png">-->
-
         <script src="/webjars/bootstrap/2.2.1/js/bootstrap.min.js"></script>
-
         <script type="text/javascript" src='assets/js/javabot.js'></script>
-
         <link rel="stylesheet/less" type="text/css" media="screen" href='assets/style/main.less'>
         <script type='text/javascript' src='/webjars/less/1.3.1/less.min.js'></script>
     </head>
@@ -55,11 +50,11 @@
                 <table>
                     <tr>
                         <td>Channels</td>
+                    <#if isAdmin()>
                         <td>
-                            <#if isAdmin()>
-                                <a href="/botadmin/newChannel}">+</a>
-                            </#if>
+                            <a href="/botadmin/newChannel">+</a>
                         </td>
+                    </#if>
                     </tr>
                 </table>
             </h3>
