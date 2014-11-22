@@ -3,6 +3,7 @@ package javabot.web;
 import com.google.inject.Injector;
 import io.dropwizard.views.freemarker.FreemarkerViewRenderer;
 import javabot.BaseTest;
+import javabot.model.Factoid;
 import javabot.web.views.FactoidsView;
 import javabot.web.views.IndexView;
 import net.htmlparser.jericho.Element;
@@ -42,7 +43,7 @@ public class ViewsTest extends BaseTest {
     public void factoids() throws IOException {
         FreemarkerViewRenderer renderer = new FreemarkerViewRenderer();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        renderer.render(new FactoidsView(injector, new MockServletRequest(false), 0), Locale.getDefault(), output);
+        renderer.render(new FactoidsView(injector, new MockServletRequest(false), 0, new Factoid()), Locale.getDefault(), output);
         Source source = new Source(new ByteArrayInputStream(output.toByteArray()));
         System.out.println("source = " + source);
     }

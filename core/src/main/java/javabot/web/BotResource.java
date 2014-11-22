@@ -2,6 +2,7 @@ package javabot.web;
 
 import com.google.inject.Injector;
 import io.dropwizard.views.View;
+import javabot.model.Factoid;
 import javabot.web.views.FactoidsView;
 import javabot.web.views.IndexView;
 
@@ -38,9 +39,11 @@ public class BotResource {
     @GET
     @Path("/factoids")
     @Produces("text/html;charset=ISO-8859-1")
-    public View factoids(@Context HttpServletRequest request, @QueryParam("page") Integer page) {
-        System.out.println("page = " + page);
-        return new FactoidsView(BotResource.this.injector, request, page == null ? 1 : page);
+    public View factoids(@Context HttpServletRequest request, @QueryParam("page") Integer page,
+                         @QueryParam("name") String name, @QueryParam("value") String value, @QueryParam("userName") String userName) {
+        System.out.println("request = [" + request + "], page = [" + page + "], name = [" + name + "], value = [" + value
+                           + "], userName = [" + userName + "]");
+        return new FactoidsView(BotResource.this.injector, request, page == null ? 1 : page, new Factoid(name, value, userName));
     }
 
 }
