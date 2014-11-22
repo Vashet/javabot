@@ -24,7 +24,7 @@ public class FactoidsView extends PagedView {
     public FactoidsView(final Injector injector, final HttpServletRequest request, final Integer page, final Factoid filter) {
         super(injector, request, page);
         this.filter = filter;
-        itemCount = factoidDao.count();
+        itemCount = factoidDao.factoidCountFiltered(filter);
     }
 
     @Override
@@ -38,8 +38,7 @@ public class FactoidsView extends PagedView {
 
     @Override
     public List<Factoid> getPageItems() {
-        QueryParam qp = new QueryParam(getIndex(),  ITEMS_PER_PAGE, "Name", true);
-        return factoidDao.getFactoidsFiltered(qp, filter);
+        return factoidDao.getFactoidsFiltered(new QueryParam(getIndex(),  ITEMS_PER_PAGE, "Name", true), filter);
     }
 
     public String format(final LocalDateTime date) {
