@@ -4,19 +4,15 @@
             <td class="right top" colspan="4">
                 <div id="pagination" class="pagination">
                     <ul>
-                    <#if previousPage?? >
-                        <li class="prev"><a href="/factoids?page=${previousPage}">&larr; Previous</a></li>
-                    <#else>
-                        <li class="prev disabled"><a>&larr; Previous</a></li>
-                    </#if>
-                        <li class="current">
-                            Displaying ${startRange} to ${endRange} of ${itemCount}
+                        <li id="previousPage" class="prev <#if !previousPage?? >disabled</#if>">
+                            <a <#if previousPage?? >href="${previousPage}"</#if>>&larr; Previous</a>
                         </li>
-                    <#if nextPage?? >
-                        <li class="next"><a href="/factoids?page=${nextPage}">Next &rarr;</a></li>
-                    <#else>
-                        <li class="next disabled"><a>Next &rarr;</a></li>
-                    </#if>
+
+                        <li id="currentPage" class="current"> Displaying ${startRange} to ${endRange} of ${itemCount} </li>
+
+                        <li id="nextPage" class="next <#if !nextPage?? >disabled</#if>">
+                            <a <#if nextPage?? >href="${nextPage}"</#if>>Next &rarr;</a>
+                        </li>
                     </ul>
                 </div>
             </td>

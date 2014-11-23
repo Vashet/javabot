@@ -8,19 +8,13 @@ import java.util.List;
 
 public abstract class PagedView extends MainView {
     public static final int ITEMS_PER_PAGE = 50;
-    private final Integer nextPage;
-    private final Integer previousPage;
-    private final Integer pageOffset = ITEMS_PER_PAGE;
-    private final Integer page;
-    private Integer index;
+    private final Integer itemsPerPage = ITEMS_PER_PAGE;
+    private int page;
     private Long itemCount;
 
-    public PagedView(final Injector injector, final HttpServletRequest request, final Integer page) {
+    public PagedView(final Injector injector, final HttpServletRequest request, final int currentPage) {
         super(injector, request);
-        this.page = page;
-        this.index = (page - 1) * ITEMS_PER_PAGE;
-        nextPage = page + 1;
-        previousPage = page == 1 ? null : page - 1;
+        this.page = currentPage;
     }
 
     public final Long getItemCount() {
@@ -32,32 +26,52 @@ public abstract class PagedView extends MainView {
 
     public abstract Long countItems();
 
-    public Integer getIndex() {
-        return index;
+    public int getPage() {
+        if (page < 1) {
+            page = 1;
+        } else if (page > getPageCount()) {
+            page = getPageCount();
+        }
+        return page;
     }
 
-    public Long getPageCount() {
-        return getItemCount() / 50;
+    public int getIndex() {
+        int index = (getPage() - 1) * getItemsPerPage();
+        if (getItemCount() == 0) {
+            return -1;
+        } else if (index > getItemCount()) {
+            return (getPageCount() - 1) * getItemsPerPage();
+        } else {
+            return index;
+        }
     }
 
-    public Integer getPageOffset() {
-        return pageOffset;
+    public int getPageCount() {
+        return Double.valueOf(Math.ceil(1.0 * getItemCount() / getItemsPerPage())).intValue();
     }
 
-    public Integer getNextPage() {
-        return nextPage < getPageCount() ? nextPage : null;
+    public int getItemsPerPage() {
+        return itemsPerPage;
     }
 
-    public Integer getPreviousPage() {
-        return previousPage;
+    public String getNextPage() {
+        final int nextPage = getPage() + 1;
+        return nextPage <= getPageCount() ? getPageUrl() + "?page=" + nextPage : null;
     }
 
-    public Long getEndRange() {
-        return Math.min(getItemCount(), getStartRange() + ITEMS_PER_PAGE - 1);
+    protected abstract String getPageUrl();
+
+    public String getPreviousPage() {
+        final int previousPage = getPage() == 1 ? -1 : getPage() - 1;
+        return previousPage > 0 ? (getPageUrl() + "?page=" + previousPage) : null;
     }
 
-    public Long getStartRange() {
-        return index + 1L;
+    public long getEndRange() {
+        return Math.min(getItemCount(), getStartRange() + getItemsPerPage() - 1);
+    }
+
+    public long getStartRange() {
+        return getIndex() + 1L;
     }
 
     public abstract List<Factoid> getPageItems();

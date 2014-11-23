@@ -48,6 +48,7 @@ public class Factoid implements Serializable, Persistent {
         this.name = name;
         this.value = value;
         this.userName = userName;
+        updated = LocalDateTime.now();
     }
 
     public ObjectId getId() {

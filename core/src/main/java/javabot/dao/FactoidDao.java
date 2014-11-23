@@ -3,6 +3,7 @@ package javabot.dao;
 import java.util.List;
 import javax.inject.Inject;
 
+import com.mongodb.WriteResult;
 import org.mongodb.morphia.query.Query;
 import javabot.dao.util.QueryParam;
 import javabot.model.Factoid;
@@ -121,5 +122,9 @@ public class FactoidDao extends BaseDao<Factoid> {
       criteria.query().limit(qp.getCount());
     }
     return criteria.query();
+  }
+
+  public WriteResult deleteAll() {
+    return ds.delete(ds.createQuery(Factoid.class));
   }
 }
