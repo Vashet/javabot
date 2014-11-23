@@ -30,6 +30,16 @@ public class Karma implements Serializable, Persistent {
 
     private LocalDateTime updated;
 
+    public Karma() {
+    }
+
+    public Karma(final String name, final Integer value, final String userName) {
+        this.name = name;
+        this.value = value;
+        this.userName = userName;
+        updated = LocalDateTime.now();
+    }
+
     public ObjectId getId() {
         return id;
     }

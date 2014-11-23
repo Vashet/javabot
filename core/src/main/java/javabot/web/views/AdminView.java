@@ -13,7 +13,7 @@ public class AdminView extends MainView {
     }
 
     @Override
-    public String getChildView() throws IOException, WebApplicationException {
+    public String getChildView() {
         return "/admin.ftl";
     }
 }

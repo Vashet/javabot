@@ -6,7 +6,7 @@ import javabot.model.Factoid;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-public abstract class PagedView extends MainView {
+public abstract class PagedView<V> extends MainView {
     public static final int ITEMS_PER_PAGE = 50;
     private final Integer itemsPerPage = ITEMS_PER_PAGE;
     private int page;
@@ -16,6 +16,13 @@ public abstract class PagedView extends MainView {
         super(injector, request);
         this.page = currentPage;
     }
+
+    @Override
+    public final String getChildView() {
+        return "paged.ftl";
+    }
+
+    public abstract String getPagedView();
 
     public final Long getItemCount() {
         if (itemCount == null) {
@@ -74,5 +81,5 @@ public abstract class PagedView extends MainView {
         return getIndex() + 1L;
     }
 
-    public abstract List<Factoid> getPageItems();
+    public abstract List<V> getPageItems();
 }

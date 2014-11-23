@@ -4,9 +4,12 @@ import com.google.inject.Injector;
 import io.dropwizard.views.freemarker.FreemarkerViewRenderer;
 import javabot.BaseTest;
 import javabot.dao.FactoidDao;
+import javabot.dao.KarmaDao;
 import javabot.model.Factoid;
+import javabot.model.Karma;
 import javabot.web.views.FactoidsView;
 import javabot.web.views.IndexView;
+import javabot.web.views.KarmaView;
 import javabot.web.views.PagedView;
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.Source;
@@ -27,6 +30,9 @@ public class ViewsTest extends BaseTest {
 
     @Inject
     private FactoidDao factoidDao;
+
+    @Inject
+    private KarmaDao karmaDao;
 
     @Test
     public void index() throws IOException {
@@ -58,6 +64,25 @@ public class ViewsTest extends BaseTest {
         String content = currentPage.getContent().toString().trim();
         Assert.assertEquals("Displaying 1 to 1 of 1", content);
     }
+    @Test
+    public void karma() throws IOException {
+        createKarma(100);
+
+        FreemarkerViewRenderer renderer = new FreemarkerViewRenderer();
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        renderer.render(new KarmaView(injector, new MockServletRequest(false), 0), Locale.getDefault(), output);
+        Source source = new Source(new ByteArrayInputStream(output.toByteArray()));
+
+        Element previousPage = source.getElementById("previousPage");
+        Element nextPage = source.getElementById("nextPage");
+        Element currentPage = source.getElementById("currentPage");
+        Assert.assertTrue(previousPage.getStartTag().getAttributeValue("class"),
+                          previousPage.getStartTag().getAttributeValue("class").contains("disabled"));
+        Assert.assertFalse(nextPage.getStartTag().getAttributeValue("class"),
+                           nextPage.getStartTag().getAttributeValue("class").contains("disabled"));
+        String content = currentPage.getContent().toString().trim();
+        Assert.assertEquals("Displaying 1 to 50 of 100", content);
+    }
 
     @Test
     public void factoidFilter() throws IOException {
@@ -73,6 +98,7 @@ public class ViewsTest extends BaseTest {
         String content = currentPage.getContent().toString().trim();
         Assert.assertEquals("Displaying 1 to 1 of 1", content);
     }
+
     @Test
     public void factoidBadFilter() throws IOException {
         createFactoids(10);
@@ -136,6 +162,13 @@ public class ViewsTest extends BaseTest {
         factoidDao.deleteAll();
         for (int i = 0; i < count; i++) {
             factoidDao.save(new Factoid("name " + i, "value " + i, "userName " + i));
+        }
+    }
+
+    private void createKarma(final int count) {
+        karmaDao.deleteAll();
+        for (int i = 0; i < count; i++) {
+            karmaDao.save(new Karma("name " + i, i, "userName " + i));
         }
     }
 

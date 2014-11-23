@@ -5,6 +5,7 @@ import io.dropwizard.views.View;
 import javabot.model.Factoid;
 import javabot.web.views.FactoidsView;
 import javabot.web.views.IndexView;
+import javabot.web.views.KarmaView;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -41,9 +42,14 @@ public class BotResource {
     @Produces("text/html;charset=ISO-8859-1")
     public View factoids(@Context HttpServletRequest request, @QueryParam("page") Integer page,
                          @QueryParam("name") String name, @QueryParam("value") String value, @QueryParam("userName") String userName) {
-        System.out.println("request = [" + request + "], page = [" + page + "], name = [" + name + "], value = [" + value
-                           + "], userName = [" + userName + "]");
         return new FactoidsView(BotResource.this.injector, request, page == null ? 1 : page, new Factoid(name, value, userName));
+    }
+    @GET
+    @Path("/karma")
+    @Produces("text/html;charset=ISO-8859-1")
+    public View karmas(@Context HttpServletRequest request, @QueryParam("page") Integer page,
+                         @QueryParam("name") String name, @QueryParam("value") Integer value, @QueryParam("userName") String userName) {
+        return new KarmaView(BotResource.this.injector, request, page == null ? 1 : page);
     }
 
 }

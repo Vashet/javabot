@@ -12,7 +12,7 @@ public class IndexView extends MainView {
     }
 
     @Override
-    public String getChildView() throws IOException, WebApplicationException {
+    public String getChildView() {
         return "/index.ftl";
     }
 }

@@ -18,11 +18,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
 public abstract class MainView extends View {
 
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd hh:mm");
     private final HttpServletRequest request;
 
     @Inject
@@ -40,7 +43,7 @@ public abstract class MainView extends View {
         this.request = request;
     }
 
-    public abstract String getChildView() throws IOException, WebApplicationException;
+    public abstract String getChildView();
 
     public long getFactoidCount() {
         return factoidDao.count();
@@ -84,5 +87,9 @@ public abstract class MainView extends View {
 
     public HttpServletRequest getRequest() {
         return request;
+    }
+
+    public String format(final LocalDateTime date) {
+        return DATE_TIME_FORMATTER.format(date);
     }
 }

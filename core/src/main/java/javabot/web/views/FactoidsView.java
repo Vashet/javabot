@@ -10,17 +10,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.WebApplicationException;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public class FactoidsView extends PagedView {
+public class FactoidsView extends PagedView<Factoid> {
     private static final Logger LOG = LoggerFactory.getLogger(FactoidsView.class);
 
-    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd hh:mm");
     private final Factoid filter;
     private Long itemCount = 0L;
 
@@ -86,12 +81,8 @@ public class FactoidsView extends PagedView {
         return url;
     }
 
-    public String format(final LocalDateTime date) {
-        return DATE_TIME_FORMATTER.format(date);
-    }
-
     @Override
-    public String getChildView() throws IOException, WebApplicationException {
+    public String getPagedView() {
         return "/factoids.ftl";
     }
 
