@@ -33,6 +33,10 @@ public abstract class PagedView<V> extends MainView {
 
     public abstract Long countItems();
 
+    public V getFilter() {
+        return null;
+    }
+
     public int getPage() {
         if (page < 1) {
             page = 1;

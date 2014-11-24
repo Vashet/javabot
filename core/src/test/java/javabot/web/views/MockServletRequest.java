@@ -1,6 +1,7 @@
-package javabot.web;
+package javabot.web.views;
 
 import javabot.BaseTest;
+import javabot.web.JavabotConfiguration;
 import javabot.web.model.Authority;
 import javabot.web.model.InMemoryUserCache;
 import javabot.web.model.User;

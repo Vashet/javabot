@@ -2,7 +2,9 @@ package javabot.web;
 
 import com.google.inject.Injector;
 import io.dropwizard.views.View;
+import javabot.model.Change;
 import javabot.model.Factoid;
+import javabot.web.views.ChangesView;
 import javabot.web.views.FactoidsView;
 import javabot.web.views.IndexView;
 import javabot.web.views.KarmaView;
@@ -44,12 +46,20 @@ public class BotResource {
                          @QueryParam("name") String name, @QueryParam("value") String value, @QueryParam("userName") String userName) {
         return new FactoidsView(BotResource.this.injector, request, page == null ? 1 : page, new Factoid(name, value, userName));
     }
+
     @GET
     @Path("/karma")
     @Produces("text/html;charset=ISO-8859-1")
     public View karmas(@Context HttpServletRequest request, @QueryParam("page") Integer page,
-                         @QueryParam("name") String name, @QueryParam("value") Integer value, @QueryParam("userName") String userName) {
+                       @QueryParam("name") String name, @QueryParam("value") Integer value, @QueryParam("userName") String userName) {
         return new KarmaView(BotResource.this.injector, request, page == null ? 1 : page);
+    }
+
+    @GET
+    @Path("/changes")
+    @Produces("text/html;charset=ISO-8859-1")
+    public View changess(@Context HttpServletRequest request, @QueryParam("page") Integer page, @QueryParam("message") String message) {
+        return new ChangesView(BotResource.this.injector, request, page == null ? 1 : page, new Change(message));
     }
 
 }

@@ -19,6 +19,13 @@ public class Change implements Serializable, Persistent {
     @Indexed(name = "changed")
     private LocalDateTime changeDate;
 
+    public Change() {
+    }
+
+    public Change(final String message) {
+        this.message = message;
+    }
+
     public ObjectId getId() {
         return id;
     }

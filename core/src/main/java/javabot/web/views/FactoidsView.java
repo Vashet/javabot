@@ -25,7 +25,7 @@ public class FactoidsView extends PagedView<Factoid> {
     public FactoidsView(final Injector injector, final HttpServletRequest request, final Integer page, final Factoid filter) {
         super(injector, request, page);
         this.filter = filter;
-        itemCount = factoidDao.factoidCountFiltered(filter);
+        itemCount = factoidDao.countFiltered(filter);
     }
 
     @Override

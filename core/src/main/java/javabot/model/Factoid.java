@@ -40,6 +40,7 @@ public class Factoid implements Serializable, Persistent {
     private Boolean locked;
     private String upperName;
     private String upperUserName;
+    private String upperValue;
 
     public Factoid() {
     }
@@ -48,7 +49,6 @@ public class Factoid implements Serializable, Persistent {
         this.name = name;
         this.value = value;
         this.userName = userName;
-        updated = LocalDateTime.now();
     }
 
     public ObjectId getId() {
@@ -184,6 +184,7 @@ public class Factoid implements Serializable, Persistent {
     public void uppers() {
         upperName = name.toUpperCase();
         upperUserName = userName.toUpperCase();
+        upperValue = value.toUpperCase();
     }
 
     @Override

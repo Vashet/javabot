@@ -11,7 +11,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 
-@Path("/botadmin")
+@Path("/admin")
 public class AdminResource {
     @Inject
     private Injector injector;
