@@ -3,9 +3,7 @@ package javabot.web.views;
 import io.dropwizard.views.freemarker.FreemarkerViewRenderer;
 import javabot.dao.ChangeDao;
 import javabot.model.Change;
-import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.Source;
-import org.junit.Assert;
 import org.testng.annotations.Test;
 
 import javax.inject.Inject;
@@ -25,7 +23,7 @@ public class ChangesViewTest extends ViewsTest {
 
         FreemarkerViewRenderer renderer = new FreemarkerViewRenderer();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        renderer.render(new ChangesView(injector, new MockServletRequest(false), 0, new Change()), Locale.getDefault(), output);
+        renderer.render(new ChangesView(getInjector(), new MockServletRequest(false), 0, new Change()), Locale.getDefault(), output);
         Source source = new Source(new ByteArrayInputStream(output.toByteArray()));
 
         previousDisabled(source);
@@ -33,7 +31,7 @@ public class ChangesViewTest extends ViewsTest {
         checkRange(source, 1, 30, 30);
 
         output = new ByteArrayOutputStream();
-        renderer.render(new ChangesView(injector, new MockServletRequest(false), 0, new Change("change 2")), Locale.getDefault(), output);
+        renderer.render(new ChangesView(getInjector(), new MockServletRequest(false), 0, new Change("change 2")), Locale.getDefault(), output);
         source = new Source(new ByteArrayInputStream(output.toByteArray()));
 
         previousDisabled(source);

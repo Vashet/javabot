@@ -80,7 +80,7 @@ public class FactoidsViewTest extends ViewsTest {
     protected Source render(final int page, final Factoid filter) throws IOException {
         FreemarkerViewRenderer renderer = new FreemarkerViewRenderer();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        renderer.render(new FactoidsView(injector, new MockServletRequest(false), page, filter), Locale.getDefault(), output);
+        renderer.render(new FactoidsView(getInjector(), new MockServletRequest(false), page, filter), Locale.getDefault(), output);
         return new Source(new ByteArrayInputStream(output.toByteArray()));
     }
 

@@ -126,9 +126,7 @@ public class BaseTest {
     }
 
     protected org.pircbotx.Channel getJavabotChannel() {
-        org.pircbotx.Channel channel = getIrcBot().getUserChannelDao().getChannel("#jbunittest");
-        assert channel != null;
-        return channel;
+        return getIrcBot().getUserChannelDao().getChannel("#jbunittest");
     }
 
     @SuppressWarnings({"EmptyCatchBlock"})
@@ -161,5 +159,4 @@ public class BaseTest {
         nickServDao.save(info);
         return bob;
     }
-
 }

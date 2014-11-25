@@ -4,7 +4,6 @@ import io.dropwizard.views.freemarker.FreemarkerViewRenderer;
 import javabot.dao.KarmaDao;
 import javabot.model.Karma;
 import net.htmlparser.jericho.Source;
-import org.junit.Assert;
 import org.testng.annotations.Test;
 
 import javax.inject.Inject;
@@ -24,7 +23,7 @@ public class KarmaViewTest extends ViewsTest {
 
         FreemarkerViewRenderer renderer = new FreemarkerViewRenderer();
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        renderer.render(new KarmaView(injector, new MockServletRequest(false), 0), Locale.getDefault(), output);
+        renderer.render(new KarmaView(getInjector(), new MockServletRequest(false), 0), Locale.getDefault(), output);
         Source source = new Source(new ByteArrayInputStream(output.toByteArray()));
 
         previousDisabled(source);

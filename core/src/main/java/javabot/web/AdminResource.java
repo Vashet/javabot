@@ -3,7 +3,10 @@ package javabot.web;
 import com.google.inject.Injector;
 import io.dropwizard.auth.Auth;
 import io.dropwizard.views.View;
-import javabot.web.views.AdminView;
+import javabot.model.Admin;
+import javabot.web.auth.Restricted;
+import javabot.web.model.Authority;
+import javabot.web.views.AdminIndexView;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -17,8 +20,8 @@ public class AdminResource {
     private Injector injector;
 
     @GET
-    public View index(@Context HttpServletRequest request, @Auth String credentials) {
-        return new AdminView(injector, request);
+    public View index(@Context HttpServletRequest request, @Restricted(Authority.ROLE_PUBLIC) Admin user) {
+        return new AdminIndexView(injector, request);
     }
 
 }

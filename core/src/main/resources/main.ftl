@@ -40,9 +40,9 @@
             <div>
                 <h3>Admin</h3>
                 <ul>
-                    <li><a href="/botadmin">Admins</a></li>
-                    <li><a href="/botadmin/config">Configuration</a></li>
-                    <li><a href="/botadmin/javadoc">Javadoc</a></li>
+                    <li><a href="/admin">Admins</a></li>
+                    <li><a href="/admin/config">Configuration</a></li>
+                    <li><a href="/admin/javadoc">Javadoc</a></li>
                 </ul>
             </div>
             </#if>
@@ -53,7 +53,7 @@
                         <td>Channels</td>
                     <#if isAdmin()>
                         <td>
-                            <a href="/botadmin/newChannel">+</a>
+                            <a href="/admin/newChannel">+</a>
                         </td>
                     </#if>
                     </tr>
