@@ -1,12 +1,10 @@
-package com.mongodb.dibs.auth;
+package javabot.web.auth;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
-import com.mongodb.dibs.DibsConfiguration;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import javabot.web.JavabotConfiguration;
-import javabot.web.auth.OpenIDCredentials;
 import javabot.web.model.Authority;
 import javabot.web.model.InMemoryUserCache;
 import javabot.web.model.User;

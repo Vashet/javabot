@@ -9,6 +9,7 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
 import javabot.JavabotModule;
+import javabot.web.auth.RestrictedProvider;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.mongodb.morphia.Datastore;
 
@@ -42,11 +43,15 @@ public class JavabotApplication extends Application<JavabotConfiguration> {
         environment.getApplicationContext().setSessionsEnabled(true);
         environment.getApplicationContext().setSessionHandler(new SessionHandler());
 
-        environment.jersey().register(injector.getInstance(BotResource.class));
-        environment.jersey().register(injector.getInstance(AdminResource.class));
         PublicOAuthResource oauth = injector.getInstance(PublicOAuthResource.class);
         oauth.setConfiguration(configuration);
         environment.jersey().register(oauth);
+
+        environment.jersey().register(injector.getInstance(BotResource.class));
+        environment.jersey().register(injector.getInstance(AdminResource.class));
+        environment.jersey().register(new RuntimeExceptionMapper(configuration));
+        environment.jersey().register(new RestrictedProvider());
+
         environment.servlets().addFilter("html", new HtmlToResourceFilter())
                    .addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), false, "*.html");
 
