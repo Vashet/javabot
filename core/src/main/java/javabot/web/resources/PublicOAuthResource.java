@@ -1,9 +1,11 @@
-package javabot.web;
+package javabot.web.resources;
 
 import com.antwerkz.sofia.Sofia;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Optional;
 import javabot.dao.AdminDao;
+import javabot.model.Admin;
+import javabot.web.JavabotConfiguration;
 import javabot.web.model.Authority;
 import javabot.web.model.InMemoryUserCache;
 import javabot.web.model.OAuthConfig;
@@ -95,6 +97,10 @@ public class PublicOAuthResource {
 
                 Optional<User> userOptional = InMemoryUserCache.INSTANCE.getByOpenIDIdentifier(tempUser.getOpenIDIdentifier());
                 if (!userOptional.isPresent()) {
+                    Admin admin = adminDao.getAdminByEmailAddress(tempUser.getEmail());
+                    if(admin != null) {
+                        tempUser.getAuthorities().add(Authority.ROLE_ADMIN);
+                    }
                     InMemoryUserCache.INSTANCE.put(tempUser);
                 } else {
                     tempUser = userOptional.get();

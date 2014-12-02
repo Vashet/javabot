@@ -11,9 +11,7 @@ import org.slf4j.*;
 
 public class Sofia {
     private static Map<Locale, ResourceBundle> messages = new HashMap<>();
-        private static final Logger logger = LoggerFactory.getLogger(Sofia.class);
-
-    private Sofia() {}
+    private static final Logger logger = LoggerFactory.getLogger(Sofia.class);
 
     private static ResourceBundle getBundle(Locale... localeList) {
         Locale locale = localeList.length == 0 ? Locale.getDefault() : localeList[0];
@@ -66,6 +64,18 @@ public class Sofia {
     }
     public static String accountTooNew(Locale... locale) {
         return getMessageValue("account.too.new", locale);
+    }
+
+    public static String action(Locale... locale) {
+        return getMessageValue("action", locale);
+    }
+
+    public static String addedBy(Locale... locale) {
+        return getMessageValue("addedBy", locale);
+    }
+
+    public static String addedOn(Locale... locale) {
+        return getMessageValue("addedOn", locale);
     }
 
     public static String adminAdded(Object arg0, Locale... locale) {
@@ -398,6 +408,10 @@ public class Sofia {
 
     public static String shunned(Object arg0, java.util.Date arg1, Locale... locale) {
         return MessageFormat.format(getMessageValue("shunned", locale), arg0, arg1);
+    }
+
+    public static String submit(Locale... locale) {
+        return getMessageValue("submit", locale);
     }
 
     public static String throttleThreshold(Locale... locale) {

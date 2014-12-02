@@ -1,4 +1,4 @@
-package javabot.web;
+package javabot.web.resources;
 
 import com.google.inject.Injector;
 import io.dropwizard.views.View;
@@ -29,6 +29,9 @@ public class BotResource {
     @GET
     @Produces("text/html;charset=ISO-8859-1")
     public View index(@Context HttpServletRequest request) {
+        if(request.getParameter("test.exception") != null) {
+            throw new RuntimeException("Testing 500 pages");
+        }
         return new IndexView(BotResource.this.injector, request);
     }
 

@@ -1,7 +1,6 @@
 package javabot.web.views;
 
 import com.google.inject.Injector;
-import io.dropwizard.views.View;
 import javabot.dao.ChangeDao;
 import javabot.dao.util.QueryParam;
 import javabot.model.Change;
@@ -10,7 +9,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-public class ChangesView extends PagedView {
+public class ChangesView extends PagedView<Change> {
     private final Change filter;
     @Inject
     private ChangeDao changeDao;
@@ -26,7 +25,7 @@ public class ChangesView extends PagedView {
     }
 
     @Override
-    public Object getFilter() {
+    public Change getFilter() {
         return filter;
     }
 
@@ -41,7 +40,7 @@ public class ChangesView extends PagedView {
     }
 
     @Override
-    public List getPageItems() {
+    public List<Change> getPageItems() {
         return changeDao.getChanges(new QueryParam(getIndex(), ITEMS_PER_PAGE, "updated", true), filter);
     }
 }

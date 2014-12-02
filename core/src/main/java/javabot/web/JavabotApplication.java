@@ -10,6 +10,9 @@ import io.dropwizard.setup.Environment;
 import io.dropwizard.views.ViewBundle;
 import javabot.JavabotModule;
 import javabot.web.auth.RestrictedProvider;
+import javabot.web.resources.AdminResource;
+import javabot.web.resources.BotResource;
+import javabot.web.resources.PublicOAuthResource;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.mongodb.morphia.Datastore;
 
@@ -49,7 +52,7 @@ public class JavabotApplication extends Application<JavabotConfiguration> {
 
         environment.jersey().register(injector.getInstance(BotResource.class));
         environment.jersey().register(injector.getInstance(AdminResource.class));
-        environment.jersey().register(new RuntimeExceptionMapper(configuration));
+        environment.jersey().register(new RuntimeExceptionMapper(injector, configuration));
         environment.jersey().register(new RestrictedProvider());
 
         environment.servlets().addFilter("html", new HtmlToResourceFilter())

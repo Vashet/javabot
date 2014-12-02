@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public class IndexTest extends ViewsTest{
+public class IndexTest extends ViewsTest {
     @Test
     public void index() throws IOException {
         find(false);
@@ -25,7 +25,7 @@ public class IndexTest extends ViewsTest{
 
         renderer.render(new IndexView(getInjector(), new MockServletRequest(loggedIn)), Locale.getDefault(), output);
         Source source = new Source(new ByteArrayInputStream(output.toByteArray()));
-        List<Element> a = source.getAllElements("href", "/botadmin/newChannel", false);
+        List<Element> a = source.getAllElements("href", "/admin/newChannel", false);
         Assert.assertEquals(loggedIn ? 1 : 0, a.size());
     }
 }

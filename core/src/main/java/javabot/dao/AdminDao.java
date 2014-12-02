@@ -45,9 +45,10 @@ public class AdminDao extends BaseDao<Admin> {
         AdminCriteria criteria = new AdminCriteria(ds);
         criteria.emailAddress(email);
         Admin admin = criteria.query().get();
-        if(admin == null) {
+        if(admin == null && count() == 0) {
             admin = new Admin();
             admin.setEmailAddress(email);
+            admin.setBotOwner(true);
             save(admin);
         }
         return admin;

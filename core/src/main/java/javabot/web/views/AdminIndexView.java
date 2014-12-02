@@ -1,5 +1,6 @@
 package javabot.web.views;
 
+import com.antwerkz.sofia.Sofia;
 import com.google.inject.Injector;
 import javabot.dao.AdminDao;
 import javabot.model.Admin;
@@ -22,6 +23,10 @@ public class AdminIndexView extends MainView {
     public List<Admin> getAdmins() {
         List<Admin> all = adminDao.findAll();
         return all;
+    }
+
+    public Sofia sofia() {
+        return new Sofia();
     }
 
     @Override

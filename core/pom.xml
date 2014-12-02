@@ -379,6 +379,26 @@
             <groupId>org.aeonbits.owner</groupId>
             <artifactId>owner</artifactId>
         </dependency>
+
+<!--
+        <dependency>
+            <groupId>org.seleniumhq.webdriver</groupId>
+            <artifactId>webdriver-selenium</artifactId>
+            <version>0.9.7376</version>
+        </dependency>
+-->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-chrome-driver</artifactId>
+            <version>2.44.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-firefox-driver</artifactId>
+            <version>2.44.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <reporting>

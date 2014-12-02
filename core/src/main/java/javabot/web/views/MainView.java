@@ -26,7 +26,7 @@ import java.util.UUID;
 public abstract class MainView extends View {
 
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd hh:mm");
-    private final HttpServletRequest request;
+    private HttpServletRequest request;
 
     @Inject
     private AdminDao adminDao;
@@ -37,8 +37,12 @@ public abstract class MainView extends View {
     @Inject
     private FactoidDao factoidDao;
 
-    public MainView(final Injector injector, final HttpServletRequest request) {
+    public MainView() {
         super("/main.ftl", Charsets.ISO_8859_1);
+    }
+
+    public MainView(final Injector injector, final HttpServletRequest request) {
+        this();
         injector.injectMembers(this);
         this.request = request;
     }
