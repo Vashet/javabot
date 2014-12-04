@@ -39,7 +39,7 @@ public class AdminOperationTest extends BaseMessagingTest {
     }
 
     public BotOperation findOperation(final String name) {
-        for (BotOperation op : getJavabot().getAllOperations()) {
+        for (BotOperation op : getJavabot().getActiveOperations()) {
             if (op.getName().equals(name)) {
                 return op;
             }

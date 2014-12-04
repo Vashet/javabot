@@ -5,7 +5,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.jayway.awaitility.Awaitility;
-import javabot.commands.AdminCommand;
 import javabot.dao.ChannelDao;
 import javabot.dao.ConfigDao;
 import javabot.dao.EventDao;
@@ -20,7 +19,6 @@ import javabot.model.Logs;
 import javabot.model.Logs.Type;
 import javabot.operations.BotOperation;
 import javabot.operations.OperationComparator;
-import javabot.operations.StandardOperation;
 import javabot.operations.throttle.NickServViolationException;
 import javabot.operations.throttle.Throttler;
 import javabot.web.JavabotApplication;
@@ -33,11 +31,9 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -90,8 +86,6 @@ public class Javabot {
 
     private final ScheduledExecutorService eventHandler =
         Executors.newScheduledThreadPool(2, new JavabotThreadFactory(true, "javabot-event-handler"));
-
-    private final List<BotOperation> standard = new ArrayList<>();
 
     private final List<String> ignores = new ArrayList<>();
 
@@ -208,8 +202,7 @@ public class Javabot {
         if (allOperations == null) {
             final Config config = configDao.get();
             allOperations = new TreeMap<>();
-            for (final BotOperation op : BotOperation.list()) {
-                injector.injectMembers(op);
+            for (final BotOperation op : configDao.list()) {
                 allOperations.put(op.getName(), op);
             }
             try {
@@ -218,16 +211,6 @@ public class Javabot {
                 LOG.error(e.getMessage(), e);
                 throw new RuntimeException(e.getMessage(), e);
             }
-            addDefaultOperations(ServiceLoader.load(AdminCommand.class));
-            addDefaultOperations(ServiceLoader.load(StandardOperation.class));
-            Collections.sort(standard, new BotOperationComparator());
-        }
-    }
-
-    private void addDefaultOperations(final ServiceLoader<? extends BotOperation> loader) {
-        for (final BotOperation operation : loader) {
-            injector.injectMembers(operation);
-            standard.add(operation);
         }
     }
 
@@ -249,10 +232,8 @@ public class Javabot {
         return enabled;
     }
 
-    public List<BotOperation> getAllOperations() {
-        final List<BotOperation> ops = new ArrayList<>(activeOperations);
-        ops.addAll(standard);
-        return ops;
+    public Set<BotOperation> getActiveOperations() {
+        return activeOperations;
     }
 
     public String[] getStartStrings() {
@@ -328,7 +309,7 @@ public class Javabot {
     }
 
     public boolean getResponses(final Message message, final User requester) {
-        final Iterator<BotOperation> iterator = getAllOperations().iterator();
+        final Iterator<BotOperation> iterator = getActiveOperations().iterator();
         boolean handled = false;
         while (iterator.hasNext() && !handled) {
             handled = iterator.next().handleMessage(message);
@@ -341,7 +322,7 @@ public class Javabot {
     }
 
     public boolean getChannelResponses(final Message event) {
-        final Iterator<BotOperation> iterator = getAllOperations().iterator();
+        final Iterator<BotOperation> iterator = getActiveOperations().iterator();
         boolean handled = false;
 //        if (!throttler.isThrottled(event.getUser())) {
             while (iterator.hasNext() && !handled) {

@@ -11,7 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 @SPI(StandardOperation.class)
-public class VersionOperation extends StandardOperation {
+public class VersionOperation extends BotOperation implements StandardOperation  {
     @Override
     public boolean handleMessage(final Message event) {
         final String message = event.getValue();

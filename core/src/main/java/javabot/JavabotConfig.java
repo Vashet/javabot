@@ -31,15 +31,18 @@ public interface JavabotConfig extends Config {
     int databasePort();
 
     @Key("javabot.nick")
+    @DefaultValue("testjavabot")
     String nick();
 
     @Key("javabot.password")
     String password();
 
     @Key("javabot.admin.nick")
+    @DefaultValue("testadmin")
     String adminNick();
 
     @Key("javabot.admin.hostmask")
+    @DefaultValue("@nowhere/special")
     String adminHostMask();
 
     @Key("javabot.bitly.token")

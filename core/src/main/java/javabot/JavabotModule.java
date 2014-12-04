@@ -101,7 +101,7 @@ public class JavabotModule extends AbstractModule {
     @Provides
     @Singleton
     public BitlyClient bitlyClient() throws IOException {
-        return new BitlyClient(javabotConfig().bitlyToken());
+        return javabotConfig().bitlyToken() != null ? new BitlyClient(javabotConfig().bitlyToken()) : null;
     }
 
     @Provides

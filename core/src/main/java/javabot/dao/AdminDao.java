@@ -66,8 +66,7 @@ public class AdminDao extends BaseDao<Admin> {
         return admin;
     }
 
-    public void enableOperation(String name, User user) {
-        Admin admin = getAdmin(user);
+    public void enableOperation(String name, Admin admin) {
         OperationEvent event = new OperationEvent();
         event.setOperation(name);
         event.setRequestedOn(LocalDateTime.now());
@@ -79,8 +78,7 @@ public class AdminDao extends BaseDao<Admin> {
         configDao.save(config);
     }
 
-    public void disableOperation(String name, User user) {
-        Admin admin = getAdmin(user);
+    public void disableOperation(String name, Admin admin) {
         OperationEvent event = new OperationEvent();
         event.setOperation(name);
         event.setRequestedOn(LocalDateTime.now());

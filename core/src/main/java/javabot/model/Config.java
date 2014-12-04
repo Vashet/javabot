@@ -35,7 +35,7 @@ public class Config implements Serializable, Persistent {
 
   private Integer throttleThreshold = 5;
 
-  private Integer mininumNickServAge = 14;
+  private Integer minimumNickServAge = 14;
 
   public Config() {
   }
@@ -62,12 +62,12 @@ public class Config implements Serializable, Persistent {
     id = configId;
   }
 
-  public Integer getMininumNickServAge() {
-    return mininumNickServAge;
+  public Integer getMinimumNickServAge() {
+    return minimumNickServAge;
   }
 
-  public void setMininumNickServAge(final Integer mininumNickServAge) {
-    this.mininumNickServAge = mininumNickServAge;
+  public void setMinimumNickServAge(final Integer minimumNickServAge) {
+    this.minimumNickServAge = minimumNickServAge;
   }
 
   public String getNick() {
@@ -161,7 +161,7 @@ public class Config implements Serializable, Persistent {
         ", nick='" + nick + '\'' +
         ", schemaVersion=" + schemaVersion +
         ", throttleThreshold=" + throttleThreshold +
-        ", mininumNickServAge=" + mininumNickServAge +
+        ", mininumNickServAge=" + minimumNickServAge +
         ", operations=" + operations +
         '}';
   }

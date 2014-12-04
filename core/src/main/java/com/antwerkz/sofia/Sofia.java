@@ -198,6 +198,42 @@ public class Sofia {
         return getMessageValue("channel.updated", locale);
     }
 
+    public static String configIrcHistory(Locale... locale) {
+        return getMessageValue("config.irc.history", locale);
+    }
+
+    public static String configIrcNick(Locale... locale) {
+        return getMessageValue("config.irc.nick", locale);
+    }
+
+    public static String configIrcPassword(Locale... locale) {
+        return getMessageValue("config.irc.password", locale);
+    }
+
+    public static String configIrcPort(Locale... locale) {
+        return getMessageValue("config.irc.port", locale);
+    }
+
+    public static String configIrcServer(Locale... locale) {
+        return getMessageValue("config.irc.server", locale);
+    }
+
+    public static String configIrcTrigger(Locale... locale) {
+        return getMessageValue("config.irc.trigger", locale);
+    }
+
+    public static String configMinimumNickservAge(Locale... locale) {
+        return getMessageValue("config.minimum.nickserv.age", locale);
+    }
+
+    public static String configThrottleThreshold(Locale... locale) {
+        return getMessageValue("config.throttle.threshold", locale);
+    }
+
+    public static String configWebUrl(Locale... locale) {
+        return getMessageValue("config.web.url", locale);
+    }
+
     public static String configurationMissingProperties(Object arg0, Locale... locale) {
         return MessageFormat.format(getMessageValue("configuration.missing.properties", locale), arg0);
     }
@@ -280,30 +316,6 @@ public class Sofia {
 
     public static String invalidDateFormat(Object arg0, Locale... locale) {
         return MessageFormat.format(getMessageValue("invalid.date.format", locale), arg0);
-    }
-
-    public static String ircHistory(Locale... locale) {
-        return getMessageValue("irc.history", locale);
-    }
-
-    public static String ircNick(Locale... locale) {
-        return getMessageValue("irc.nick", locale);
-    }
-
-    public static String ircPassword(Locale... locale) {
-        return getMessageValue("irc.password", locale);
-    }
-
-    public static String ircPort(Locale... locale) {
-        return getMessageValue("irc.port", locale);
-    }
-
-    public static String ircServer(Locale... locale) {
-        return getMessageValue("irc.server", locale);
-    }
-
-    public static String ircTrigger(Locale... locale) {
-        return getMessageValue("irc.trigger", locale);
     }
 
     public static String ircName(Locale... locale) {
@@ -414,10 +426,6 @@ public class Sofia {
         return getMessageValue("submit", locale);
     }
 
-    public static String throttleThreshold(Locale... locale) {
-        return getMessageValue("throttle.threshold", locale);
-    }
-
     public static String throttledUser(Locale... locale) {
         return getMessageValue("throttled.user", locale);
     }
@@ -452,10 +460,6 @@ public class Sofia {
 
     public static String weatherUnknown(Object arg0, Locale... locale) {
         return MessageFormat.format(getMessageValue("weather.unknown", locale), arg0);
-    }
-
-    public static String webUrl(Locale... locale) {
-        return getMessageValue("web.url", locale);
     }
 
 

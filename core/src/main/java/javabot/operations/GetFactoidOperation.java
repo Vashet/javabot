@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @SPI(StandardOperation.class)
-public class GetFactoidOperation extends StandardOperation {
+public class GetFactoidOperation extends BotOperation implements StandardOperation  {
     @Inject
     private FactoidDao factoidDao;
 

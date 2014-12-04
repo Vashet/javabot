@@ -1,5 +1,6 @@
 package javabot.web.views;
 
+import com.antwerkz.sofia.Sofia;
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.inject.Injector;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,6 +39,8 @@ public abstract class MainView extends View {
     @Inject
     private FactoidDao factoidDao;
 
+    private List<String> errors = new ArrayList<>();
+
     public MainView() {
         super("/main.ftl", Charsets.ISO_8859_1);
     }
@@ -45,6 +49,10 @@ public abstract class MainView extends View {
         this();
         injector.injectMembers(this);
         this.request = request;
+    }
+
+    public Sofia sofia() {
+        return new Sofia();
     }
 
     public abstract String getChildView();
@@ -93,6 +101,17 @@ public abstract class MainView extends View {
         return request;
     }
 
+    public void addError(String message) {
+        errors.add(message);
+    }
+
+    public List<String> getErrors() {
+        return errors;
+    }
+
+    public boolean hasErrors() {
+        return !errors.isEmpty();
+    }
     public String format(final LocalDateTime date) {
         return DATE_TIME_FORMATTER.format(date);
     }

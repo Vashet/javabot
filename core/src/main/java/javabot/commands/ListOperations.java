@@ -3,15 +3,20 @@ package javabot.commands;
 import com.antwerkz.maven.SPI;
 import com.antwerkz.sofia.Sofia;
 import javabot.Message;
-import javabot.operations.BotOperation;
+import javabot.dao.ConfigDao;
 import org.apache.commons.lang.StringUtils;
+
+import javax.inject.Inject;
 
 @SPI({AdminCommand.class})
 public class ListOperations extends OperationsCommand {
+    @Inject
+    private ConfigDao configDao;
+
     @Override
     public void execute(final Message event) {
         getBot().postMessage(event.getChannel(), event.getUser(),
-                             Sofia.adminKnownOperations(event.getUser().getNick(), StringUtils.join(BotOperation.list().iterator(), ",")),
+                             Sofia.adminKnownOperations(event.getUser().getNick(), StringUtils.join(configDao.list().iterator(), ",")),
                              event.isTell());
 
         listCurrent(event);

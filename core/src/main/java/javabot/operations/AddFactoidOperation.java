@@ -15,7 +15,7 @@ import javax.inject.Inject;
 import java.time.LocalDateTime;
 
 @SPI(StandardOperation.class)
-public class AddFactoidOperation extends StandardOperation {
+public class AddFactoidOperation extends BotOperation implements StandardOperation {
     public static final Logger log = LoggerFactory.getLogger(AddFactoidOperation.class);
 
     @Inject
