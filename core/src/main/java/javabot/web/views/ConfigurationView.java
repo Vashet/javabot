@@ -33,7 +33,7 @@ public class ConfigurationView extends MainView {
     }
 
     public List<BotOperation> operations() {
-        List<BotOperation> all = new ArrayList<>(configDao.list());
+        List<BotOperation> all = new ArrayList<>(javabot.getAllOperations().values());
         Collections.sort(all, (left, right) -> left.getName().compareTo(right.getName()));
         return all;
     }

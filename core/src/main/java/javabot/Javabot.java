@@ -95,7 +95,7 @@ public class Javabot {
 
     public void start() {
         setUpThreads();
-        loadOperations();
+        getAllOperations();
         applyUpgradeScripts();
         connect();
         startWebApp();
@@ -182,7 +182,7 @@ public class Javabot {
     }
 
     public void startWebApp() {
-        if(javabotConfig.startWebApp()) {
+        if (javabotConfig.startWebApp()) {
             try {
                 injector.getInstance(JavabotApplication.class).run(new String[]{"server", "javabot.yml"});
             } catch (Exception e) {
@@ -190,6 +190,7 @@ public class Javabot {
             }
         }
     }
+
     protected final void applyUpgradeScripts() {
         for (final UpgradeScript script : UpgradeScript.loadScripts()) {
             injector.injectMembers(script);
@@ -198,7 +199,7 @@ public class Javabot {
     }
 
     @SuppressWarnings({"unchecked"})
-    protected final void loadOperations() {
+    public final Map<String, BotOperation> getAllOperations() {
         if (allOperations == null) {
             final Config config = configDao.get();
             allOperations = new TreeMap<>();
@@ -212,12 +213,16 @@ public class Javabot {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
+        return allOperations;
     }
 
     public boolean disableOperation(final String name) {
         boolean disabled = false;
-        if (allOperations.get(name) != null) {
-            activeOperations.remove(allOperations.get(name));
+        if (getAllOperations().get(name) != null) {
+            getActiveOperations().remove(getAllOperations().get(name));
+            Config config = configDao.get();
+            config.getOperations().remove(name);
+            configDao.save(config);
             disabled = true;
         }
         return disabled;
@@ -225,8 +230,11 @@ public class Javabot {
 
     public boolean enableOperation(final String name) {
         boolean enabled = false;
-        if (allOperations.get(name) != null) {
-            activeOperations.add(allOperations.get(name));
+        if (getAllOperations().get(name) != null) {
+            Config config = configDao.get();
+            config.getOperations().add(name);
+            getActiveOperations().add(getAllOperations().get(name));
+            configDao.save(config);
             enabled = true;
         }
         return enabled;
@@ -324,18 +332,18 @@ public class Javabot {
     public boolean getChannelResponses(final Message event) {
         final Iterator<BotOperation> iterator = getActiveOperations().iterator();
         boolean handled = false;
-//        if (!throttler.isThrottled(event.getUser())) {
-            while (iterator.hasNext() && !handled) {
-                handled = iterator.next().handleChannelMessage(event);
-            }
-//        } else {
-//            try {
-//                postMessage(null, event.getUser(), Sofia.throttledUser(), false);
-//            } catch (NickServViolationException e) {
-//                handled = true;
-//                postMessage(null, event.getUser(), e.getMessage(), false);
-//            }
-//        }
+        //        if (!throttler.isThrottled(event.getUser())) {
+        while (iterator.hasNext() && !handled) {
+            handled = iterator.next().handleChannelMessage(event);
+        }
+        //        } else {
+        //            try {
+        //                postMessage(null, event.getUser(), Sofia.throttledUser(), false);
+        //            } catch (NickServViolationException e) {
+        //                handled = true;
+        //                postMessage(null, event.getUser(), e.getMessage(), false);
+        //            }
+        //        }
         return handled;
     }
 

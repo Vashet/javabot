@@ -326,6 +326,18 @@ public class Sofia {
         return MessageFormat.format(getMessageValue("javadoc.api.list", locale), arg0, arg1);
     }
 
+    public static String javadocApiName(Locale... locale) {
+        return getMessageValue("javadoc.api.name", locale);
+    }
+
+    public static String javadocDownloadUrl(Locale... locale) {
+        return getMessageValue("javadoc.download.url", locale);
+    }
+
+    public static String javadocUrl(Locale... locale) {
+        return getMessageValue("javadoc.url", locale);
+    }
+
     public static String jsrInvalid(Object arg0, Locale... locale) {
         return MessageFormat.format(getMessageValue("jsr.invalid", locale), arg0);
     }

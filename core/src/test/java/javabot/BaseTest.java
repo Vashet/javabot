@@ -2,6 +2,7 @@ package javabot;
 
 import com.jayway.awaitility.Awaitility;
 import com.jayway.awaitility.Duration;
+import freemarker.log.Logger;
 import javabot.dao.AdminDao;
 import javabot.dao.ChangeDao;
 import javabot.dao.ChannelDao;
@@ -99,6 +100,7 @@ public class BaseTest {
         datastore.delete(logsDao.getQuery(Logs.class));
         datastore.delete(changeDao.getQuery(Change.class));
 
+        Logger logger = Logger.getLogger("freemarker.cache");
     }
 
     @BeforeMethod

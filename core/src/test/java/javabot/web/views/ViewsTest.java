@@ -1,11 +1,17 @@
 package javabot.web.views;
 
 import com.google.inject.Injector;
+import io.dropwizard.views.View;
+import io.dropwizard.views.freemarker.FreemarkerViewRenderer;
 import javabot.BaseTest;
 import net.htmlparser.jericho.Source;
 import org.testng.Assert;
 
 import javax.inject.Inject;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Locale;
 
 public class ViewsTest extends BaseTest {
 
@@ -39,5 +45,12 @@ public class ViewsTest extends BaseTest {
 
     public Injector getInjector() {
         return injector;
+    }
+
+    protected Source render(final View view) throws IOException {
+        FreemarkerViewRenderer renderer = new FreemarkerViewRenderer();
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        renderer.render(view, Locale.getDefault(), output);
+        return new Source(new ByteArrayInputStream(output.toByteArray()));
     }
 }

@@ -99,12 +99,12 @@
         <tr>
             <td class="top">${operation}</td>
             <td class="top button">
-                <a id="enable${operation.name}" title="Enable" <#if enabled(operation) >class="inactive"<#else>class="active"</#if>
+                <a id="enable${operation.name}" title="Enable" <#if enabled(operation.name) >class="inactive"<#else>class="active"</#if>
                 href="/admin/enableOperation/${operation.name}">
                 <img src="/assets/images/boomy/add24.png" alt="Enable"></a>
             </td>
             <td class="top right button">
-                <a id="disable${operation.name}" title="Disable" <#if enabled(operation) >class="active"<#else>class="inactive"</#if>
+                <a id="disable${operation.name}" title="Disable" <#if enabled(operation.name) >class="active"<#else>class="inactive"</#if>
                 href="/admin/disableOperation/${operation.name}">
                 <img src="/assets/images/boomy/delete24.png" alt="Disable"></a>
             </td>
