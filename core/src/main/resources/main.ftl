@@ -53,7 +53,7 @@
                         <td>Channels</td>
                     <#if isAdmin()>
                         <td>
-                            <a href="/admin/newChannel">+</a>
+                            <a id="newChannel" href="/admin/newChannel">+</a>
                         </td>
                     </#if>
                     </tr>

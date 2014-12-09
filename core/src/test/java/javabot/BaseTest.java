@@ -85,6 +85,8 @@ public class BaseTest {
         Admin admin = adminDao.getAdmin(testUser);
         if (admin == null) {
             admin = adminDao.create(testUser.getNick(), testUser.getRealName(), testUser.getHostmask());
+            admin.setBotOwner(true);
+            adminDao.save(admin);
         }
         admin.setEmailAddress(BOT_EMAIL);
         adminDao.save(admin);
