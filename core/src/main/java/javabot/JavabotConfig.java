@@ -6,8 +6,7 @@ import org.aeonbits.owner.Config.LoadType;
 import org.aeonbits.owner.Config.Sources;
 
 @LoadPolicy(LoadType.MERGE)
-@Sources({"classpath:javabot.properties",
-          "file:javabot-sample.properties",
+@Sources({"file:javabot-sample.properties",
           "file:javabot.properties"
           })
 public interface JavabotConfig extends Config {
