@@ -1,6 +1,5 @@
 package javabot.model;
 
-import com.antwerkz.maven.SPI;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.AlsoLoad;
 import org.mongodb.morphia.annotations.Entity;
@@ -12,7 +11,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity(value = "admins", noClassnameStored = true)
-@SPI(Persistent.class)
 @Indexes({
              @Index(value = "emailAddress", unique = true),
              @Index("ircName, hostName")

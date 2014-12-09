@@ -15,6 +15,7 @@ import javabot.javadoc.JavadocClass;
 import javabot.model.Channel;
 import javabot.model.Config;
 import javabot.model.Factoid;
+import javabot.web.JavabotApplication;
 import net.swisstech.bitly.BitlyClient;
 import org.aeonbits.owner.Config.Key;
 import org.aeonbits.owner.ConfigFactory;

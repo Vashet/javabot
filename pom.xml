@@ -11,8 +11,6 @@
     <name>javabot</name>
 
     <modules>
-        <module>spi-apt</module>
-        <module>apt-tools</module>
         <module>core</module>
     </modules>
 
@@ -171,8 +169,6 @@
         <profile>
             <id>migration</id>
             <modules>
-                <module>spi-apt</module>
-                <module>apt-tools</module>
                 <module>core</module>
             </modules>
         </profile>

@@ -1,6 +1,5 @@
 package javabot.model;
 
-import com.antwerkz.maven.SPI;
 import com.fasterxml.jackson.annotation.JsonView;
 import javabot.json.Views.PUBLIC;
 import javabot.json.Views.SYSTEM;
@@ -16,7 +15,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity(value = "channels", noClassnameStored = true)
-@SPI(Persistent.class)
 @Indexes({
              @Index(value = "upperName", unique = true, dropDups = true)
          })

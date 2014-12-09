@@ -17,6 +17,7 @@ import javabot.model.Channel;
 import javabot.model.Logs;
 import javabot.model.NickServInfo;
 import javabot.model.UserFactory;
+import javabot.operations.BotOperation;
 import org.mongodb.morphia.Datastore;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
@@ -28,6 +29,7 @@ import org.testng.annotations.Guice;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.EnumSet;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 @Guice(modules = {JavabotTestModule.class})
@@ -81,6 +83,7 @@ public class BaseTest {
     @BeforeTest
     public void setup() {
         bot.start();
+        enableAllOperations();
         User testUser = getTestUser();
         Admin admin = adminDao.getAdmin(testUser);
         if (admin == null) {
@@ -103,6 +106,18 @@ public class BaseTest {
         datastore.delete(changeDao.getQuery(Change.class));
 
         Logger logger = Logger.getLogger("freemarker.cache");
+    }
+
+    protected void enableAllOperations() {
+        for (Entry<String, BotOperation> entry : bot.getAllOperations().entrySet()) {
+            bot.enableOperation(entry.getKey());
+        }
+    }
+
+    protected void disableAllOperations() {
+        for (Entry<String, BotOperation> entry : bot.getAllOperations().entrySet()) {
+            bot.disableOperation(entry.getKey());
+        }
     }
 
     @BeforeMethod

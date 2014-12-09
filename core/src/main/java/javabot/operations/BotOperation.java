@@ -1,19 +1,12 @@
 package javabot.operations;
 
-import com.google.inject.Provider;
 import javabot.Javabot;
 import javabot.Message;
 import javabot.dao.AdminDao;
 import org.pircbotx.User;
-import org.pircbotx.hooks.events.MessageEvent;
-import org.reflections.Reflections;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
-import java.util.ServiceLoader;
-import java.util.Set;
 
 public abstract class BotOperation {
     static Random random = new Random();

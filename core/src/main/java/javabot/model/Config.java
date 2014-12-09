@@ -1,16 +1,14 @@
 package javabot.model;
 
-import java.io.Serializable;
-import java.util.Set;
-import java.util.TreeSet;
-
-import com.antwerkz.maven.SPI;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
+import java.io.Serializable;
+import java.util.Set;
+import java.util.TreeSet;
+
 @Entity("configuration")
-@SPI(Persistent.class)
 public class Config implements Serializable, Persistent {
   @Id
   private ObjectId id;

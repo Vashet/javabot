@@ -83,9 +83,9 @@ public class JavadocTest extends BaseMessagingTest {
     public void jdk() throws MalformedURLException {
         getJavabot();
         if (Boolean.valueOf(System.getProperty("dropJDK", "false"))) {
-            System.out.println("Dropping JDK API");
+            LOG.debug("Dropping JDK API");
             dropApi("JDK");
-            System.out.println("Done");
+            LOG.debug("Done");
         }
         JavadocApi api = apiDao.find("JDK");
         if (api == null) {
@@ -103,7 +103,7 @@ public class JavadocTest extends BaseMessagingTest {
         ApiEvent event = new ApiEvent(getTestUser().getNick(), apiName, apiUrlString, downloadUrlString);
         eventDao.save(event);
         waitForEvent(event, "adding " + apiName, new Duration(30, TimeUnit.MINUTES));
-        LOG.info("done waiting for event to finish");
+        LOG.debug("done waiting for event to finish");
         getMessages().get();
     }
 

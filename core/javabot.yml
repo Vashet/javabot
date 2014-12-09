@@ -15,7 +15,7 @@ logging:
   # Logger-specific levels.
   loggers:
 
-    com.antwerkz: DEBUG
+    com.antwerkz: INFO
     javax.ws.rs: DEBUG
     com.sun.jersey: ERROR
     org.eclipse.jetty: ERROR

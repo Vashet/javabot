@@ -3,6 +3,7 @@ package javabot.web;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Singleton;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
@@ -27,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.EnumSet;
 
+@Singleton
 public class JavabotApplication extends Application<JavabotConfiguration> {
     @Inject
     private Datastore ds;

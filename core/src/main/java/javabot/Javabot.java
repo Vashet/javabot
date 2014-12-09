@@ -5,6 +5,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import com.jayway.awaitility.Awaitility;
+import javabot.commands.AdminCommand;
 import javabot.dao.ChannelDao;
 import javabot.dao.ConfigDao;
 import javabot.dao.EventDao;
@@ -19,6 +20,7 @@ import javabot.model.Logs;
 import javabot.model.Logs.Type;
 import javabot.operations.BotOperation;
 import javabot.operations.OperationComparator;
+import javabot.operations.StandardOperation;
 import javabot.operations.throttle.NickServViolationException;
 import javabot.operations.throttle.Throttler;
 import javabot.web.JavabotApplication;
@@ -218,8 +220,9 @@ public class Javabot {
 
     public boolean disableOperation(final String name) {
         boolean disabled = false;
-        if (getAllOperations().get(name) != null) {
-            getActiveOperations().remove(getAllOperations().get(name));
+        BotOperation operation = getAllOperations().get(name);
+        if (operation != null && !(operation instanceof AdminCommand) && !(operation instanceof StandardOperation)) {
+            getActiveOperations().remove(operation);
             Config config = configDao.get();
             config.getOperations().remove(name);
             configDao.save(config);

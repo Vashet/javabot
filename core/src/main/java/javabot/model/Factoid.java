@@ -1,6 +1,5 @@
 package javabot.model;
 
-import com.antwerkz.maven.SPI;
 import com.fasterxml.jackson.annotation.JsonView;
 import javabot.json.Views.PUBLIC;
 import javabot.operations.TellSubject;
@@ -22,7 +21,6 @@ import java.time.LocalDateTime;
 import static java.lang.String.format;
 
 @Entity(value = "factoids", noClassnameStored = true)
-@SPI(Persistent.class)
 @Indexes({
              @Index(value = "upperName", unique = true),
              @Index("upperName, upperUserName")
