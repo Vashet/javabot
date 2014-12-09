@@ -7,6 +7,7 @@ import org.aeonbits.owner.Config.Sources;
 
 @LoadPolicy(LoadType.MERGE)
 @Sources({"classpath:javabot.properties",
+          "file:javabot-sample.properties",
           "file:javabot.properties"
           })
 public interface JavabotConfig extends Config {
@@ -37,30 +38,8 @@ public interface JavabotConfig extends Config {
     @Key("javabot.password")
     String password();
 
-    @Key("javabot.admin.nick")
-    @DefaultValue("testadmin")
-    String adminNick();
-
-    @Key("javabot.admin.hostmask")
-    @DefaultValue("@nowhere/special")
-    String adminHostMask();
-
     @Key("javabot.bitly.token")
     String bitlyToken();
-
-    @Key("javabot.bitly.clientId")
-    String bitlyClientId();
-
-    @Key("javabot.bitly.secret")
-    String bitlySecret();
-
-    @Key("web.host")
-    @DefaultValue("localhost")
-    String webHost();
-
-    @Key("web.port")
-    @DefaultValue("9000")
-    Integer webPort();
 
     @Key("start.web.app")
     @DefaultValue("false")
