@@ -4,7 +4,6 @@ import com.antwerkz.sofia.Sofia;
 import com.mongodb.WriteResult;
 import javabot.dao.util.QueryParam;
 import javabot.model.Change;
-import javabot.model.Karma;
 import javabot.model.criteria.ChangeCriteria;
 import org.mongodb.morphia.query.Query;
 

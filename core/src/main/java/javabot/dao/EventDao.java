@@ -11,7 +11,7 @@ public class EventDao extends BaseDao<AdminEvent> {
 
   public AdminEvent findUnprocessed() {
     AdminEventCriteria criteria = new AdminEventCriteria(ds);
-    criteria.state().equal(State.NEW);
+    criteria.state(State.NEW);
     criteria.query().order("requestedOn");
     return criteria.query().get();
   }
